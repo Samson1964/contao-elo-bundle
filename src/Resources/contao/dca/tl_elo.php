@@ -125,7 +125,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 	'palettes' => array
 	(
 		'__selector__'                => array(''),
-		'default'                     => '{name_legend},surname,prename,intent,birthday,sex,country;{fide_legend},fideid,flag,title,w_title,o_title,foa_title,rating,games,rapid_rating,rapid_games,blitz_rating,blitz_games;{publish_legend},published'
+		'default'                     => '{name_legend},surname,prename,intent,birthday,sex,country;{fide_legend},fideid,title,w_title,o_title,foa_title;{flag_legend},flag,rapid_flag,blitz_flag;{elo_legend},rating,games,rapid_rating,rapid_games,blitz_rating,blitz_games;{publish_legend},published'
 	),
 
 	// Subpalettes
@@ -239,7 +239,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			(
 				'mandatory'           => false, 
 				'maxlength'           => 3,
-				'tl_class'            => 'w50'
+				'tl_class'            => 'w50 clr'
 			),
 			'sql'                     => "varchar(3) NOT NULL default ''"
 		),
@@ -284,6 +284,45 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 				'tl_class'            => 'w50'
 			),
 			'sql'                     => "varchar(3) NOT NULL default ''"
+		),
+		'flag' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_elo']['flag'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array
+			(
+				'mandatory'           => false, 
+				'maxlength'           => 8,
+				'tl_class'            => 'w50'
+			),
+			'sql'                     => "varchar(8) NOT NULL default ''"
+		),
+		'rapid_flag' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_elo']['rapid_flag'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array
+			(
+				'mandatory'           => false, 
+				'maxlength'           => 8,
+				'tl_class'            => 'w50 clr'
+			),
+			'sql'                     => "varchar(8) NOT NULL default ''"
+		),
+		'blitz_flag' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_elo']['blitz_flag'],
+			'exclude'                 => true,
+			'inputType'               => 'text',
+			'eval'                    => array
+			(
+				'mandatory'           => false, 
+				'maxlength'           => 8,
+				'tl_class'            => 'w50 clr'
+			),
+			'sql'                     => "varchar(8) NOT NULL default ''"
 		),
 		'rating' => array
 		(
@@ -375,19 +414,6 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 				'tl_class'            => 'w50'
 			),
 			'sql'                     => "int(8) unsigned NOT NULL default '0'"
-		),
-		'flag' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_elo']['flag'],
-			'exclude'                 => true,
-			'inputType'               => 'text',
-			'eval'                    => array
-			(
-				'mandatory'           => false, 
-				'maxlength'           => 8,
-				'tl_class'            => 'w50'
-			),
-			'sql'                     => "varchar(8) NOT NULL default ''"
 		),
 		'published' => array
 		(

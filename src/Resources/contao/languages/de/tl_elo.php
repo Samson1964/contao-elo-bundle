@@ -3,72 +3,47 @@
 /**
  * Backend-Modul: Übersetzungen im Eingabeformular
  */
-$GLOBALS["TL_LANG"]["tl_elo"]["id"][0] = "ID";
-$GLOBALS["TL_LANG"]["tl_elo"]["id"][1] = "ID der Spieler";
+$GLOBALS['TL_LANG']['tl_elo']['id'] = array('ID', 'ID der Spieler');
 
-$GLOBALS["TL_LANG"]["tl_elo"]["name_legend"] = "Personendaten";
+$GLOBALS['TL_LANG']['tl_elo']['name_legend'] = 'Personendaten';
+$GLOBALS['TL_LANG']['tl_elo']['surname'] = array('Nachname', 'Nachname des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['prename'] = array('Vorname', 'Vorname des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['intent'] = array('Titel', 'Titel, z.B. Dr.');
+$GLOBALS['TL_LANG']['tl_elo']['sex'] = array('Geschlecht', 'Geschlecht, z.B. M oder F');
+$GLOBALS['TL_LANG']['tl_elo']['country'] = array('Land', 'Land des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['birthday'] = array('Geburtstag', 'Geburtstag des Spielers');
 
-$GLOBALS["TL_LANG"]["tl_elo"]["surname"][0] = "Nachname";
-$GLOBALS["TL_LANG"]["tl_elo"]["surname"][1] = "Nachname des Spielers";
+$GLOBALS['TL_LANG']['tl_elo']['fide_legend'] = 'FIDE-Daten';
+$GLOBALS['TL_LANG']['tl_elo']['fideid'] = array('ID', 'FIDE-ID des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['title'] = array('Titel (Männer)', 'Titel des Spielers, z.B. GM');
+$GLOBALS['TL_LANG']['tl_elo']['w_title'] = array('Titel (Frauen)', 'Frauentitel des Spielers, z.B. WGM');
+$GLOBALS['TL_LANG']['tl_elo']['o_title'] = array('Titel (Organisator)', 'Organisatortitel des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['foa_title'] = array('Titel (Schiedsrichter)', 'Schiedsrichtertitel des Spielers');
 
-$GLOBALS["TL_LANG"]["tl_elo"]["prename"][0] = "Vorname";
-$GLOBALS["TL_LANG"]["tl_elo"]["prename"][1] = "Vorname des Spielers";
+$GLOBALS['TL_LANG']['tl_elo']['flag_legend'] = 'Markierungen';
+$GLOBALS['TL_LANG']['tl_elo']['flag'] = array('Markierung klassisch', 'Markierung klassische Elo-Zahl, z.B. i für inaktiv');
+$GLOBALS['TL_LANG']['tl_elo']['rapid_flag'] = array('Markierung Schnellschach', 'Markierung Schnellschach-Elo-Zahl, z.B. i für inaktiv');
+$GLOBALS['TL_LANG']['tl_elo']['blitz_flag'] = array('Markierung Blitzschach', 'Markierung Blitzschach-Elo-Zahl, z.B. i für inaktiv');
 
-$GLOBALS["TL_LANG"]["tl_elo"]["intent"][0] = "Titel";
-$GLOBALS["TL_LANG"]["tl_elo"]["intent"][1] = "Titel, z.B. Dr.";
+$GLOBALS['TL_LANG']['tl_elo']['elo_legend'] = 'Wertungszahlen';
+$GLOBALS['TL_LANG']['tl_elo']['rating'] = array('Elo klassisch', 'Klassische Elo-Zahl des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['rapid_rating'] = array('Elo Schnellschach', 'Schnellschach-Elo-Zahl des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['blitz_rating'] = array('Elo Blitzschach', 'Blitzschach-Elo-Zahl des Spielers');
+$GLOBALS['TL_LANG']['tl_elo']['games'] = array('Partien klassisch', 'Gespielte Partien mit der klassischen Elo-Zahl');
+$GLOBALS['TL_LANG']['tl_elo']['rapid_games'] = array('Partien Schnellschach', 'Gespielte Partien mit der Schnellschach-Elo-Zahl');
+$GLOBALS['TL_LANG']['tl_elo']['blitz_games'] = array('Partien Blitzschach', 'Gespielte Partien mit der Blitzschach-Elo-Zahl');
 
-$GLOBALS["TL_LANG"]["tl_elo"]["sex"][0] = "Geschlecht";
-$GLOBALS["TL_LANG"]["tl_elo"]["sex"][1] = "Geschlecht, z.B. M oder F";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["country"][0] = "Land";
-$GLOBALS["TL_LANG"]["tl_elo"]["country"][1] = "Land des Spielers";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["birthday"][0] = "Geburtstag";
-$GLOBALS["TL_LANG"]["tl_elo"]["birthday"][1] = "Geburtstag des Spielers";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["fide_legend"] = "FIDE-Daten";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["fideid"][0] = "ID";
-$GLOBALS["TL_LANG"]["tl_elo"]["fideid"][1] = "FIDE-ID des Spielers";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["flag"][0] = "Markierung";
-$GLOBALS["TL_LANG"]["tl_elo"]["flag"][1] = "Markierung, z.B. i für inaktiv";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["title"][0] = "Titel";
-$GLOBALS["TL_LANG"]["tl_elo"]["title"][1] = "Titel des Spielers, z.B. GM";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["w_title"][0] = "Titel (Frauen)";
-$GLOBALS["TL_LANG"]["tl_elo"]["w_title"][1] = "Frauentitel des Spielers, z.B. WGM";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["o_title"][0] = "Titel (Organisator)";
-$GLOBALS["TL_LANG"]["tl_elo"]["o_title"][1] = "Organisatortitel des Spielers";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["publish_legend"] = "Veröffentlichung";
-
-$GLOBALS["TL_LANG"]["tl_elo"]["published"][0] = "Veröffentlicht";
-$GLOBALS["TL_LANG"]["tl_elo"]["published"][1] = "Spieler aktivieren oder deaktivieren";
+$GLOBALS['TL_LANG']['tl_elo']['publish_legend'] = 'Veröffentlichung';
+$GLOBALS['TL_LANG']['tl_elo']['published'] = array('Veröffentlicht', 'Spieler aktivieren oder deaktivieren');
 
 /**
  * Buttons für Operationen
  */
 
-$GLOBALS['TL_LANG']['tl_elo']['new'][0] = "Neuer Spieler";
-$GLOBALS['TL_LANG']['tl_elo']['new'][1] = "Neuen Spieler anlegen";
-
-$GLOBALS['TL_LANG']['tl_elo']['edit'][0] = "Spieler der Spieler bearbeiten";
-$GLOBALS['TL_LANG']['tl_elo']['edit'][1] = "Spieler der Spieler %s bearbeiten";
-
-$GLOBALS['TL_LANG']['tl_elo']['editheader'][0] = "Spieler bearbeiten";
-$GLOBALS['TL_LANG']['tl_elo']['editheader'][1] = "Spieler %s bearbeiten";
-
-$GLOBALS['TL_LANG']['tl_elo']['copy'][0] = "Spieler kopieren";
-$GLOBALS['TL_LANG']['tl_elo']['copy'][1] = "Spieler %s kopieren";
-
-$GLOBALS['TL_LANG']['tl_elo']['delete'][0] = "Spieler löschen";
-$GLOBALS['TL_LANG']['tl_elo']['delete'][1] = "Spieler %s löschen";
-
-$GLOBALS['TL_LANG']['tl_elo']['toggle'][0] = "Spieler aktivieren/deaktivieren";
-$GLOBALS['TL_LANG']['tl_elo']['toggle'][1] = "Spieler %s aktivieren/deaktivieren";
-
-$GLOBALS['TL_LANG']['tl_elo']['show'][0] = "Spielerndetails anzeigen";
-$GLOBALS['TL_LANG']['tl_elo']['show'][1] = "Details des Spielern %s anzeigen";
+$GLOBALS['TL_LANG']['tl_elo']['new'] = array('Neuer Spieler', 'Neuen Spieler anlegen');
+$GLOBALS['TL_LANG']['tl_elo']['edit'] = array('Spieler der Spieler bearbeiten', 'Spieler der Spieler %s bearbeiten');
+$GLOBALS['TL_LANG']['tl_elo']['editheader'] = array('Spieler bearbeiten', 'Spieler %s bearbeiten');
+$GLOBALS['TL_LANG']['tl_elo']['copy'] = array('Spieler kopieren', 'Spieler %s kopieren');
+$GLOBALS['TL_LANG']['tl_elo']['delete'] = array('Spieler löschen', 'Spieler %s löschen');
+$GLOBALS['TL_LANG']['tl_elo']['toggle'] = array('Spieler aktivieren/deaktivieren', 'Spieler %s aktivieren/deaktivieren');
+$GLOBALS['TL_LANG']['tl_elo']['show'] = array('Spielerdetails anzeigen', 'Details des Spielers %s anzeigen');

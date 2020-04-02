@@ -149,7 +149,8 @@ $GLOBALS['TL_DCA']['tl_elo_listen'] = array
 			'eval'                    => array
 			(
 				'mandatory'           => true, 
-				'maxlength'           => 64
+				'maxlength'           => 64,
+				'tl_class'            => 'w50'
 			),
 			'sql'                     => "varchar(64) NOT NULL default ''"
 		),
@@ -167,7 +168,8 @@ $GLOBALS['TL_DCA']['tl_elo_listen'] = array
 				'rgxp'                => 'date',
 				'datepicker'          => true,
 				'mandatory'           => true, 
-				'maxlength'           => 10
+				'maxlength'           => 10,
+				'tl_class'            => 'w50 widget'
 			),
 			'sql'                     => "int(10) unsigned NOT NULL default '0'"
 		),
