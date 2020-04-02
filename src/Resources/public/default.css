@@ -1,0 +1,24 @@
+.ce_eloliste ul {
+	list-style-type       : none;
+}
+
+.ce_eloliste li div {
+	display               : inline-block;
+}
+
+.ce_eloliste li div.rank {
+	width                 : 60px;
+	text-align            : right;
+	margin-right          : 5px;
+}
+
+.ce_eloliste li div.name {
+	width                 : 200px;
+	text-align            : left;
+	margin-right          : 5px;
+}
+
+.ce_eloliste li div.elo {
+	width                 : 30px;
+	text-align            : right;
+}

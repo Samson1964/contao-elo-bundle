@@ -1,0 +1,18 @@
+<?php
+	$GLOBALS['TL_CSS']['eloliste'] = 'bundles/contaoelo/default.css';
+?>
+<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+
+	<?php if ($this->headline): ?>
+		<<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
+	<?php endif ?>
+
+	<?php if($this->elo): ?>
+		<ul>
+		<?php foreach($this->elo as $item): ?>
+			<li><div class="rank"><?= $item['rank'] ?></div><div class="name"><a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></div><div class="elo"><?= $item['elo'] ?></div></li>
+		<?php endforeach; ?>
+		</ul>
+	<?php endif; ?>
+
+</div>

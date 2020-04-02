@@ -1,0 +1,69 @@
+<div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
+
+	<?php if ($this->headline): ?>
+		<<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
+	<?php endif ?>
+
+	<b>Stand: <?= $this->datum ?></b>
+	
+	<div class="ce_sliderStart block">
+		<nav class="slider-control">
+			<a href="#" class="slider-prev">Zurück</a>
+			<span class="slider-menu"></span>
+			<a href="#" class="slider-next">Vorwärts</a>
+		</nav>
+		<div class="content-slider" data-config="7000,2500,0,1">
+			<div class="slider-wrapper">
+				<div class="ce_text block">
+					<h3>Top <?= $this->count ?> Turnierschach</h3>
+					<ol>
+					<?php foreach($this->eloN as $item): ?>
+						<li> <?= $item['elo'] ?> <a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></li>
+					<?php endforeach; ?>
+					</ol>
+				</div>
+				<div class="ce_text block">
+					<h3>Top <?= $this->count ?> Blitzschach</h3>
+					<ol>
+					<?php foreach($this->eloB as $item): ?>
+						<li> <?= $item['elo'] ?> <a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></li>
+					<?php endforeach; ?>
+					</ol>
+				</div>
+				<div class="ce_text block">
+					<h3>Top <?= $this->count ?> Schnellschach</h3>
+					<ol>
+					<?php foreach($this->eloR as $item): ?>
+						<li> <?= $item['elo'] ?> <a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></li>
+					<?php endforeach; ?>
+					</ol>
+				</div>
+				<div class="ce_text block">
+					<h3>Top <?= $this->count ?> weiblich Turnierschach</h3>
+					<ol>
+					<?php foreach($this->eloNw as $item): ?>
+						<li> <?= $item['elo'] ?> <a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></li>
+					<?php endforeach; ?>
+					</ol>
+				</div>
+				<div class="ce_text block">
+					<h3>Top <?= $this->count ?> weiblich Blitzschach</h3>
+					<ol>
+					<?php foreach($this->eloBw as $item): ?>
+						<li> <?= $item['elo'] ?> <a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></li>
+					<?php endforeach; ?>
+					</ol>
+				</div>
+				<div class="ce_text block">
+					<h3>Top <?= $this->count ?> weiblich Schnellschach</h3>
+					<ol>
+					<?php foreach($this->eloRw as $item): ?>
+						<li> <?= $item['elo'] ?> <a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></li>
+					<?php endforeach; ?>
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
