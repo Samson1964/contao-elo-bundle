@@ -23,10 +23,13 @@
  * file to see how back end modules are configured.
  */
 
-$GLOBALS['BE_MOD']['dsb']['elo'] = array
+/**
+ * Backend-Module
+ */
+$GLOBALS['BE_MOD']['content']['elo'] = array
 (
-   'tables'       	=> array('tl_elo_listen', 'tl_elo'),
-   'icon'         	=> 'bundles/contaoelo/images/icon.png',
+	'tables'       	=> array('tl_elo_listen', 'tl_elo'),
+	'icon'         	=> 'bundles/contaoelo/images/icon.png'
 );
 
 
