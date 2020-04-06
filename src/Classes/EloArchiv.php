@@ -44,7 +44,7 @@ class EloArchiv extends \ContentElement
 		$cachetime = 3600 * 24 * 40; // 40 Tage
 
 		// Cache initialisieren
-		$this->cache = new \Samson\Helper\Cache('Elo');
+		$this->cache = new \Schachbulle\ContaoHelperBundle\Classes\Cache('Elo');
 		$this->cache->eraseExpired(); // Cache aufräumen, abgelaufene Schlüssel löschen
 
 		$this->Template->class = $this->strTemplate;

@@ -68,7 +68,7 @@ class Elo extends \Module
 		                                    ->execute(1);
 
 		// Cache initialisieren
-		$this->cache = new \Samson\Helper\Cache('Elo');
+		$this->cache = new \Schachbulle\ContaoHelperBundle\Classes\Cache('Elo');
 		$this->cache->eraseExpired(); // Cache aufräumen, abgelaufene Schlüssel löschen
 
 		$this->Template->headline = 'FIDE-Ratingliste Deutschland';

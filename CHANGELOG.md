@@ -1,5 +1,9 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 0.0.4 (2020-04-06)
+
+Add: Abhängigkeit schachbulle/contao-helper-bundle
+
 ## Version 0.0.3 (2020-04-02)
 
 Add: Flag-Spalten für die 3 verschiedenen Elo-Zahlen (noch nicht im Import vorgesehen)
