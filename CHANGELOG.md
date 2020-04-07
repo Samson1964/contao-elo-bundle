@@ -1,5 +1,9 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 0.0.5 (2020-04-07)
+
+Fix: Änderung der Überschrift hat gefehlt -> aus alter Version wiederhergestellt
+
 ## Version 0.0.4 (2020-04-06)
 
 Add: Abhängigkeit schachbulle/contao-helper-bundle

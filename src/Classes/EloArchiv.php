@@ -33,6 +33,7 @@ class EloArchiv extends \ContentElement
 	 * @var string
 	 */
 	protected $strTemplate = 'ce_eloliste';
+	var $monat;
 
 	/**
 	 * Inhaltselement generieren
@@ -62,6 +63,22 @@ class EloArchiv extends \ContentElement
 	 */
 	function getEloliste($listid, $listtype, $count)
 	{
+
+		log_message($listid, 'elo.log');
+		if($listid == 0)
+		{
+			// Aktuellste Elo-Liste ist gewünscht
+			$objActiv = \Database::getInstance()->prepare('SELECT * FROM tl_elo_listen WHERE published=? ORDER BY datum DESC')
+			                                    ->limit(1)
+			                                    ->execute(1);
+			$listid = $objActiv->id;
+		}
+		else
+		{
+			// Stammdaten der gewünschten Eloliste laden
+			$objActiv = \Database::getInstance()->prepare('SELECT * FROM tl_elo_listen WHERE id=?')
+			                                    ->execute($listid);
+		}
 
 		switch($listtype)
 		{
@@ -99,6 +116,11 @@ class EloArchiv extends \ContentElement
 			$objElo = \Database::getInstance()->prepare('SELECT * FROM tl_elo WHERE pid=? AND published=? AND flag NOT LIKE ? '.$sql)
 			                                  ->limit($count)
 			                                  ->execute($listid, 1, '%i%');
+
+			// Überschrift ändern
+			$this->headline = str_replace('%anzahl%',$count,$this->headline);
+			$this->headline = str_replace('%monat%',$objActiv->title,$this->headline);
+
 			// Elo zuweisen
 			if($objElo->numRows > 1)
 			{
