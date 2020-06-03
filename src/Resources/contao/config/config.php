@@ -28,8 +28,8 @@
  */
 $GLOBALS['BE_MOD']['content']['elo'] = array
 (
-	'tables'       	=> array('tl_elo_listen', 'tl_elo'),
-	'icon'         	=> 'bundles/contaoelo/images/icon.png'
+	'tables'                  => array('tl_elo_listen', 'tl_elo'),
+	'icon'                    => 'bundles/contaoelo/images/icon.png'
 );
 
 
@@ -39,11 +39,19 @@ $GLOBALS['BE_MOD']['content']['elo'] = array
 
 $GLOBALS['FE_MOD']['elo'] = array
 (
-	'elo_toplist'    => 'Schachbulle\ContaoEloBundle\Classes\Elo',
+	'elo_toplist'             => 'Schachbulle\ContaoEloBundle\Classes\Elo',
 );
 
 /**
  * Inhaltselemente
  */
 
-$GLOBALS['TL_CTE']['schach']['eloliste'] = 'Schachbulle\ContaoEloBundle\Classes\EloArchiv'; 
+$GLOBALS['TL_CTE']['schach']['eloliste'] = 'Schachbulle\ContaoEloBundle\ContentElements\EloArchiv'; 
+
+/**
+ * -------------------------------------------------------------------------
+ * Voreinstellungen
+ * -------------------------------------------------------------------------
+ */
+ 
+$GLOBALS['TL_CONFIG']['eloliste_cachetime'] = 30;

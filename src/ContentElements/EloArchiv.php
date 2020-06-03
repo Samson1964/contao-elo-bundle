@@ -15,7 +15,7 @@
 /**
  * Namespace
  */
-namespace Schachbulle\ContaoEloBundle\Classes;
+namespace Schachbulle\ContaoEloBundle\ContentElements;
 
 /**
  * Class Elo
@@ -34,6 +34,7 @@ class EloArchiv extends \ContentElement
 	 */
 	protected $strTemplate = 'ce_eloliste';
 	var $monat;
+	var $cachetime;
 
 	/**
 	 * Inhaltselement generieren
@@ -42,14 +43,18 @@ class EloArchiv extends \ContentElement
 	{
 		$this->Template = new \FrontendTemplate($this->strTemplate);
 
-		$cachetime = 3600 * 24 * 40; // 40 Tage
+		$this->cachetime = 3600 * 24 * $GLOBALS['TL_CONFIG']['eloliste_cachetime'];
+
+		// Nummer der Liste ermitteln
+		if($this->eloliste_checkbox) $liste = $this->eloliste_id;
+		else $liste = 0;
 
 		// Cache initialisieren
 		$this->cache = new \Schachbulle\ContaoHelperBundle\Classes\Cache('Elo');
 		$this->cache->eraseExpired(); // Cache aufräumen, abgelaufene Schlüssel löschen
 
 		$this->Template->class = $this->strTemplate;
-		$this->Template->elo = $this->getEloliste($this->eloliste_id, $this->eloliste_typ, $this->eloliste_number);
+		$this->Template->elo = $this->getEloliste($liste, $this->eloliste_typ, $this->eloliste_number);
 		return;
 
 	}
@@ -121,10 +126,15 @@ class EloArchiv extends \ContentElement
 			$this->headline = str_replace('%anzahl%',$count,$this->headline);
 			$this->headline = str_replace('%monat%',$objActiv->title,$this->headline);
 
+			// Ausgabe-Array initialisieren
+			$result = array();
+			$result['headline'] = $this->headline;
+			$result['liste'] = array();
+			
 			// Elo zuweisen
 			if($objElo->numRows > 1)
 			{
-				$result = array();
+				
 				$i = 0;
 
 				// Datensätze anzeigen
@@ -137,7 +147,7 @@ class EloArchiv extends \ContentElement
 					$elo = (substr($listtype,0,4) == 'eloN') ? $objElo->rating : ((substr($listtype,0,4) == 'eloB') ? $objElo->blitz_rating : $objElo->rapid_rating);
 					$i++;
 
-					$result[] = array
+					$result['liste'][] = array
 					(
 						'rank' 	=> ($oldelo == $elo) ? '' : $i.'.',
 						'name' 	=> $line,
@@ -150,7 +160,7 @@ class EloArchiv extends \ContentElement
 
 				}
 				// Daten im Cache speichern
-				$this->cache->store($cachekey, $result, $cachetime);
+				$this->cache->store($cachekey, $result, $this->cachetime);
 			}
 		}
 

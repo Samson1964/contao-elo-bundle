@@ -14,11 +14,28 @@
 /**
  * Palette
  */
-$GLOBALS['TL_DCA']['tl_content']['palettes']['eloliste'] = '{type_legend},type,headline;{eloliste_legend},eloliste_id,eloliste_typ,eloliste_number;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['__selector__'][] = 'eloliste_checkbox';
+$GLOBALS['TL_DCA']['tl_content']['palettes']['eloliste'] = '{type_legend},type,headline;{eloliste_legend},eloliste_checkbox;{eloliste2_legend},eloliste_typ,eloliste_number;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID,space;{invisible_legend:hide},invisible,start,stop';
+$GLOBALS['TL_DCA']['tl_content']['subpalettes']['eloliste_checkbox'] = 'eloliste_id';
 
 /**
  * Felder
  */
+
+$GLOBALS['TL_DCA']['tl_content']['fields']['eloliste_checkbox'] = array
+(
+	'label'                   => &$GLOBALS['TL_LANG']['tl_content']['eloliste_checkbox'],
+	'exclude'                 => true,
+	'inputType'               => 'checkbox',
+	'eval'                    => array
+	(
+		'tl_class'            => 'w50 clr',
+		'isBoolean'           => true,
+		'submitOnChange'      => true
+	),
+	'sql'                     => "char(1) NOT NULL default ''",
+);
+
 $GLOBALS['TL_DCA']['tl_content']['fields']['eloliste_id'] = array
 (
 	'label'                => &$GLOBALS['TL_LANG']['tl_content']['eloliste_id'],
@@ -30,7 +47,7 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['eloliste_id'] = array
 		'mandatory'      => true,
 		'multiple'       => false,
 		'chosen'         => true,
-		'submitOnChange' => true,
+		'submitOnChange' => false,
 		'tl_class'       => 'w50'
 	),
 	'sql'                  => "int(10) unsigned NOT NULL default '0'"
@@ -89,7 +106,7 @@ class tl_content_eloliste extends Backend
 
 		while($objListe->next())
 		{
-			$array[$objListe->id] = $objListe->title.' ('.$objListe->datum.')';
+			$array[$objListe->id] = $objListe->title.' ('.date('d.m.Y', $objListe->datum).')';
 		}
 		return $array;
 

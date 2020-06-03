@@ -3,13 +3,13 @@
 ?>
 <div class="<?= $this->class ?> block"<?= $this->cssID ?><?php if ($this->style): ?> style="<?= $this->style ?>"<?php endif; ?>>
 
-	<?php if ($this->headline): ?>
-		<<?= $this->hl ?>><?= $this->headline ?></<?= $this->hl ?>>
+	<?php if ($this->elo['headline']): ?>
+		<<?= $this->hl ?>><?= $this->elo['headline'] ?></<?= $this->hl ?>>
 	<?php endif ?>
 
-	<?php if($this->elo): ?>
+	<?php if($this->elo['liste']): ?>
 		<ul>
-		<?php foreach($this->elo as $item): ?>
+		<?php foreach($this->elo['liste'] as $item): ?>
 			<li><div class="rank"><?= $item['rank'] ?></div><div class="name"><a href="http://ratings.fide.com/card.phtml?event=<?= $item['fid'] ?>" target="_blank"><?= $item['title'] ?><?= $item['name'] ?></a></div><div class="elo"><?= $item['elo'] ?></div></li>
 		<?php endforeach; ?>
 		</ul>
