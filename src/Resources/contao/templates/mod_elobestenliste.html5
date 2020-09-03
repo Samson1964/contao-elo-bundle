@@ -2,8 +2,6 @@
 
 <?php $this->block('content'); ?>
 
-<pre>
 <?= $this->content; ?>
-</pre>
 
 <?php $this->endblock(); ?>

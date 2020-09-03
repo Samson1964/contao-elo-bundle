@@ -1,5 +1,10 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.0.1 (2020-09-03)
+
+* pre-Tag im Template mod_elobestenliste entfernt
+* bei gleicher Elo Platznummer nicht ausgeben
+
 ## Version 2.0.0 (2020-09-03)
 
 * Neues Feld in Elo-Listen: Monat der Liste im Format JJJJMM

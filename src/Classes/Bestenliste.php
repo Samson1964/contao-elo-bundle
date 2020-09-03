@@ -127,15 +127,18 @@ class Bestenliste extends \Module
 		$content .= '<th>Elo</th>';
 		$content .= '<th>Monat</th>';
 		$content .= '</tr>';
+		$altelo = 0;
 		for($x = 0; $x < count($result); $x++)
 		{
 			$content .= '<tr>';
-			$content .= '<td class="place">'.($x+1).'</td>';
+			if($altelo == $result[$x]['elo']) $content .= '<td class="place"></td>';
+			else $content .= '<td class="place">'.($x+1).'</td>';
 			$content .= '<td class="name">'.$result[$x]['name'].'</td>';
 			$content .= '<td class="titel">'.$result[$x]['title'].'</td>';
 			$content .= '<td class="elo">'.$result[$x]['elo'].'</td>';
 			$content .= '<td class="monat">'.$result[$x]['monat'].'</td>';
 			$content .= '</tr>';
+			$altelo = $result[$x]['elo'];
 		}
 		$content .= '</table>';
 
