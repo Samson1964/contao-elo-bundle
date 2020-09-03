@@ -80,9 +80,9 @@ class Bestenliste extends \Module
 			if($this->elo_gender == 'W') $sql .= 'AND tl_elo.sex = \'F\' ';
 
 			// Elo laden
-			$objElo = \Database::getInstance()->prepare('SELECT *, tl_elo_listen.title AS listentitel, tl_elo.title AS elotitel FROM tl_elo LEFT JOIN tl_elo_listen ON tl_elo.pid = tl_elo_listen.id WHERE tl_elo_listen.published = ? AND tl_elo.published = ? AND tl_elo_listen.listmonth > 0 AND tl_elo.rating >= ? '.$sql.'ORDER BY tl_elo.rating DESC, tl_elo_listen.listmonth ASC')
+			$objElo = \Database::getInstance()->prepare('SELECT *, tl_elo_listen.title AS listentitel, tl_elo.title AS elotitel FROM tl_elo LEFT JOIN tl_elo_listen ON tl_elo.pid = tl_elo_listen.id WHERE tl_elo_listen.published = ? AND tl_elo.published = ? AND tl_elo_listen.listmonth > 0 AND tl_elo.rating >= ? AND tl_elo.flag NOT LIKE ? '.$sql.'ORDER BY tl_elo.rating DESC, tl_elo_listen.listmonth ASC')
 			//                                  ->limit(50)
-			                                  ->execute(1, 1, $this->elo_min);
+			                                  ->execute(1, 1, $this->elo_min, '%i%');
 
 			// Elo zuweisen
 			if($objElo->numRows > 1)

@@ -1,5 +1,9 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.0.2 (2020-09-03)
+
+* Inaktive Spieler nicht ausgeben in Elo-Bestenlisten
+
 ## Version 2.0.1 (2020-09-03)
 
 * pre-Tag im Template mod_elobestenliste entfernt
