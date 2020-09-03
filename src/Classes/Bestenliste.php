@@ -121,22 +121,30 @@ class Bestenliste extends \Module
 		// Ausgabe schreiben
 		$content = '<table>';
 		$content .= '<tr>';
-		$content .= '<th>Platz</th>';
-		$content .= '<th>Name</th>';
-		$content .= '<th>Titel</th>';
-		$content .= '<th>Elo</th>';
-		$content .= '<th>Monat</th>';
+		$content .= '<th class="head_0 col_first">Platz</th>';
+		$content .= '<th class="head_1">Name</th>';
+		$content .= '<th class="head_2">Titel</th>';
+		$content .= '<th class="head_3">Elo</th>';
+		$content .= '<th class="head_4 col_last">Monat</th>';
 		$content .= '</tr>';
 		$altelo = 0;
+		$odd = 'odd';
 		for($x = 0; $x < count($result); $x++)
 		{
-			$content .= '<tr>';
-			if($altelo == $result[$x]['elo']) $content .= '<td class="place"></td>';
-			else $content .= '<td class="place">'.($x+1).'</td>';
-			$content .= '<td class="name">'.$result[$x]['name'].'</td>';
-			$content .= '<td class="titel">'.$result[$x]['title'].'</td>';
-			$content .= '<td class="elo">'.$result[$x]['elo'].'</td>';
-			$content .= '<td class="monat">'.$result[$x]['monat'].'</td>';
+			$class = 'row_'.$x.' ';
+			if($x == 0) $class .= 'row_first ';
+			elseif($x + 1 == count($result)) $class .= 'row_last ';
+			$class .= $odd;
+			if($odd == 'odd') $odd = 'even';
+			else $odd = 'odd';
+
+			$content .= '<tr class="'.$class.'">';
+			if($altelo == $result[$x]['elo']) $content .= '<td class="col_0 col_first place"></td>';
+			else $content .= '<td class="col_0 col_first place">'.($x+1).'</td>';
+			$content .= '<td class="col_1 name">'.$result[$x]['name'].'</td>';
+			$content .= '<td class="col_2 titel">'.$result[$x]['title'].'</td>';
+			$content .= '<td class="col_3 elo">'.$result[$x]['elo'].'</td>';
+			$content .= '<td class="col_4 col_last monat">'.$result[$x]['monat'].'</td>';
 			$content .= '</tr>';
 			$altelo = $result[$x]['elo'];
 		}

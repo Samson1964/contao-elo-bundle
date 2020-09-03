@@ -1,5 +1,9 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.0.3 (2020-09-03)
+
+* CSS-Klassen und DIV-Container für Elo-Bestenlisten ergänzt
+
 ## Version 2.0.2 (2020-09-03)
 
 * Inaktive Spieler nicht ausgeben in Elo-Bestenlisten
