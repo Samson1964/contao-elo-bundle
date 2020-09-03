@@ -40,6 +40,7 @@ $GLOBALS['BE_MOD']['content']['elo'] = array
 $GLOBALS['FE_MOD']['elo'] = array
 (
 	'elo_toplist'             => 'Schachbulle\ContaoEloBundle\Classes\Elo',
+	'elo_bestlist'            => 'Schachbulle\ContaoEloBundle\Classes\Bestenliste',
 );
 
 /**

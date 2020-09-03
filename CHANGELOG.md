@@ -1,5 +1,10 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.0.0 (2020-09-03)
+
+* Neues Feld in Elo-Listen: Monat der Liste im Format JJJJMM
+* Ewige Elo-Bestenliste als Modul erstellt
+
 ## Version 1.0.0 (2020-06-03)
 
 * Fix: Inhaltselement EloArchiv verschoben in Verzeichnisstruktur
