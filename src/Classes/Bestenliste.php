@@ -103,7 +103,7 @@ class Bestenliste extends \Module
 							'name'  => $line,
 							'elo'   => $objElo->rating,
 							'fid'   => $objElo->fideid,
-							'title' => ($objElo->title) ? $objElo->title . ' ' : (($objElo->w_title) ? $objElo->w_title . ' ': ''),
+							'title' => ($objElo->fidetitel) ? $objElo->fidetitel . ' ' : (($objElo->w_title) ? $objElo->w_title . ' ': ''),
 						);
 						$ids[$objElo->fideid] = true;
 					}
@@ -139,8 +139,8 @@ class Bestenliste extends \Module
 			else $odd = 'odd';
 
 			$content .= '<tr class="'.$class.'">';
-			if($altelo == $result[$x]['elo']) $content .= '<td class="col_0 col_first place"></td>';
-			else $content .= '<td class="col_0 col_first place">'.($x+1).'</td>';
+			if($altelo == $result[$x]['elo']) $content .= '<th class="col_0 col_first place"></th>';
+			else $content .= '<th class="col_0 col_first place">'.($x+1).'</th>';
 			$content .= '<td class="col_1 name">'.$result[$x]['name'].'</td>';
 			$content .= '<td class="col_2 titel">'.$result[$x]['title'].'</td>';
 			$content .= '<td class="col_3 elo">'.$result[$x]['elo'].'</td>';

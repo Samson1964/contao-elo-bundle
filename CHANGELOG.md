@@ -1,5 +1,10 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.1.1 (2020-09-08)
+
+* Fehler in Bestenliste beim FIDE-Titel behoben (falsche Korrektur)
+* 1. Spalte in Bestenliste und TopX-Liste als th formatiert
+
 ## Version 2.1.0 (2020-09-08)
 
 * DCA-Paletten tl_module ergänzt

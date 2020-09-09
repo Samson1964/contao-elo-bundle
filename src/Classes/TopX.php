@@ -141,8 +141,8 @@ class TopX extends \Module
 			}
 			
 			$content .= '<tr class="'.$class.'">';
-			if($altelo == $result[$x]['elo']) $content .= '<td class="col_0 col_first place">'.$monat.'</td>';
-			else $content .= '<td class="col_0 col_first monat">'.$monat.'</td>';
+			if($altelo == $result[$x]['elo']) $content .= '<th class="col_0 col_first place">'.$monat.'</th>';
+			else $content .= '<th class="col_0 col_first monat">'.$monat.'</th>';
 			for($z = 1; $z <= $this->elo_topx; $z++)
 			{
 				$content .= '<td class="col_'.$z.' name">'.$platz[$z-1].'</td>';
