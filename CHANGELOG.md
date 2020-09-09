@@ -1,8 +1,14 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.1.0 (2020-09-08)
+
+* DCA-Paletten tl_module ergänzt
+* FE-Modul für Ausgabe Top-X bestimmter Listen erstellt
+* Fehler in Bestenliste beim FIDE-Titel behoben
+
 ## Version 2.0.3 (2020-09-03)
 
-* CSS-Klassen und DIV-Container für Elo-Bestenlisten ergänzt
+* CSS-Klassen für Elo-Bestenlisten ergänzt
 
 ## Version 2.0.2 (2020-09-03)
 

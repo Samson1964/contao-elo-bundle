@@ -103,7 +103,7 @@ class Bestenliste extends \Module
 							'name'  => $line,
 							'elo'   => $objElo->rating,
 							'fid'   => $objElo->fideid,
-							'title' => ($objElo->elotitel) ? $objElo->elotitel . ' ' : (($objElo->w_title) ? $objElo->w_title . ' ': ''),
+							'title' => ($objElo->title) ? $objElo->title . ' ' : (($objElo->w_title) ? $objElo->w_title . ' ': ''),
 						);
 						$ids[$objElo->fideid] = true;
 					}

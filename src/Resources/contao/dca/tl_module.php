@@ -12,8 +12,9 @@
 /**
  * Add palette to tl_module
  */
-$GLOBALS['TL_DCA']['tl_module']['palettes']['elo_toplist'] = '{title_legend},name,type;{options_legend},elo_topcount;{expert_legend:hide},cssID,align,space';
-$GLOBALS['TL_DCA']['tl_module']['palettes']['elo_bestlist'] = '{title_legend},name,type;;{options_legend},elo_fromdate,elo_todate,elo_min,elo_gender,elo_topcount;{expert_legend:hide},cssID,align,space';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['elo_toplist']  = '{title_legend},name,headline,type;{options_legend},elo_topcount;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['elo_bestlist'] = '{title_legend},name,headline,type;{options_legend},elo_fromdate,elo_todate,elo_min,elo_gender,elo_topcount;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
+$GLOBALS['TL_DCA']['tl_module']['palettes']['elo_topx']     = '{title_legend},name,headline,type;{options_legend},elo_topx,elo_gender,elo_fromdate,elo_todate,elo_fidelink;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 
 $GLOBALS['TL_DCA']['tl_module']['fields']['elo_topcount'] = array
 (
@@ -30,7 +31,7 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['elo_fromdate'] = array
 	'label'                              => &$GLOBALS['TL_LANG']['tl_module']['elo_fromdate'],
 	'exclude'                            => true,
 	'inputType'                          => 'text',
-	'eval'                               => array('tl_class'=>'w50', 'rgxp'=>'digit', 'maxlength'=>6),
+	'eval'                               => array('tl_class'=>'w50 clr', 'rgxp'=>'digit', 'maxlength'=>6),
 	'sql'                                => "varchar(6) NOT NULL default ''"
 );
 
@@ -61,4 +62,30 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['elo_gender'] = array
 	'options'                            => $GLOBALS['TL_LANG']['tl_module']['elo_gender_options'],
 	'eval'                               => array('tl_class'=>'w50'),
 	'sql'                                => "char(1) NOT NULL default 'M'"
+);
+
+// Anzahl der Top-Plätze, die angezeigt werden sollen (max. 9)
+$GLOBALS['TL_DCA']['tl_module']['fields']['elo_topx'] = array
+(
+	'label'                              => &$GLOBALS['TL_LANG']['tl_module']['elo_topx'],
+	'exclude'                            => true,
+	'inputType'                          => 'text',
+	'default'                            => 3,
+	'eval'                               => array
+	(
+		'tl_class'                       => 'w50',
+		'rgxp'                           => 'digit',
+		'maxlength'                      => 1
+	),
+	'sql'                                => "int(1) unsigned NOT NULL default 3"
+);
+
+// FIDE-Link anzeigen ja/nein
+$GLOBALS['TL_DCA']['tl_module']['fields']['elo_fidelink'] = array
+(
+	'label'                              => &$GLOBALS['TL_LANG']['tl_module']['elo_fidelink'],
+	'exclude'                            => true,
+	'inputType'                          => 'checkbox',
+	'eval'                               => array('tl_class'=>'w50 clr'),
+	'sql'                                => "char(1) NOT NULL default ''"
 );
