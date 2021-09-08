@@ -17,6 +17,8 @@ $GLOBALS['TL_LANG']['tl_module']['elo_todate'] = array('Letzter Monat', 'Jüngst
 $GLOBALS['TL_LANG']['tl_module']['elo_min'] = array('Elo minimal', 'Spieler ab dieser Elo aufwärts berücksichtigen');
 $GLOBALS['TL_LANG']['tl_module']['elo_gender'] = array('Geschlecht', 'Geschlecht für Liste festlegen. Standard ist männlich, also alle Spieler.');
 $GLOBALS['TL_LANG']['tl_module']['elo_fidelink'] = array('FIDE-Link', 'Link zur FIDE-Liste hinzufügen');
+$GLOBALS['TL_LANG']['tl_module']['elo_liste'] = array('Elo-Liste', 'Elo-Liste auswählen, für die die Statistik ausgegeben werden soll. Nichts auswählen, wenn immer die aktuellste Elo-Liste verwendet werden soll.');
+$GLOBALS['TL_LANG']['tl_module']['elo_statistik'] = array('Statistik', 'Statistiken auswählen, die ausgegeben werden sollen');
 
 $GLOBALS['TL_LANG']['tl_module']['elo_gender_options'] = array
 (

@@ -1,0 +1,20 @@
+<?php $this->extend('block_unsearchable'); ?>
+
+<?php $this->block('content'); ?>
+
+<?php if($this->statistik): ?>
+<table class="elostatistik">
+	<tr>
+		<th>Kriterium</th>
+		<th>Anzahl</th>
+	</tr>
+	<?php foreach($this->statistik as $item): ?>
+		<tr>
+			<td><?= $item['name'] ?></td>
+			<td><?= $item['value'] ?></td>
+		</tr>
+	<?php endforeach; ?>
+</table>
+<?php endif; ?>
+
+<?php $this->endblock(); ?>

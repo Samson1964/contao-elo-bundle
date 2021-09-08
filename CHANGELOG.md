@@ -1,5 +1,10 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.2.0 (2021-09-08)
+
+* Add: customTpl in der Palette bei den Frontend-Modulen
+* Add: Frontend-Modul Statistik
+
 ## Version 2.1.1 (2020-09-08)
 
 * Fehler in Bestenliste beim FIDE-Titel behoben (falsche Korrektur)

@@ -42,6 +42,7 @@ $GLOBALS['FE_MOD']['elo'] = array
 	'elo_toplist'             => 'Schachbulle\ContaoEloBundle\Classes\Elo',
 	'elo_bestlist'            => 'Schachbulle\ContaoEloBundle\Classes\Bestenliste',
 	'elo_topx'                => 'Schachbulle\ContaoEloBundle\Classes\TopX',
+	'elo_statistik'           => 'Schachbulle\ContaoEloBundle\Classes\Statistik',
 );
 
 /**
