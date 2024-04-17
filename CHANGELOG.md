@@ -1,5 +1,11 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.3.0 (2024-04-17)
+
+* Add: Abhängigkeit codefog/contao-haste
+* Add: PHP-8-Unterstützung
+* Add: Haste-Toggler
+
 ## Version 2.2.0 (2021-09-08)
 
 * Add: customTpl in der Palette bei den Frontend-Modulen
