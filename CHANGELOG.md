@@ -1,5 +1,9 @@
 # FIDE-Elo-Listen Changelog
 
+## Version 2.3.2 (2026-07-29)
+
+* Fix: Warning: Undefined array key "deleteConfirm" bei contao:migrate -> Lesezugriffe auf $GLOBALS['TL_LANG'] in den DCA-Dateien mit `?? null` bzw. `?? array()` abgesichert, da der DcaLoader die Sprachdateien noch nicht geladen hat
+
 ## Version 2.3.1 (2025-09-09)
 
 * Fix: Warning: Undefined array key "elo_gender_options" in src/Resources/contao/dca/tl_module.php (line 63) 
