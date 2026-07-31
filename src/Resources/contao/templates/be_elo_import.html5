@@ -1,0 +1,209 @@
+<?php // Backend-Template: FIDE-XML-Import in eine einzelne Elo-Liste ?>
+
+<div id="tl_buttons">
+	<a href="<?= $this->zurueck ?>" class="header_back" title="Zurück zur Übersicht" accesskey="b">Zurück</a>
+</div>
+
+<h2 class="sub_headline">FIDE-Daten importieren<?php if ($this->listenTitel): ?>: <?= $this->listenTitel ?><?php endif; ?></h2>
+
+<div class="tl_formbody_edit">
+
+<?php if ($this->listeFehlt): ?>
+
+	<p class="tl_error">Es wurde keine gültige Liste ausgewählt. Bitte den Import über die Schaltfläche in der Listenübersicht starten.</p>
+
+<?php else: ?>
+
+	<fieldset class="tl_box">
+		<legend>XML-Datei ausw&auml;hlen</legend>
+		<div class="widget">
+			<p>Erwartet wird die Ratingliste von ratings.fide.com<?php if ($this->zipMoeglich): ?> — am besten direkt als
+			Zip-Datei (<em>players_list_xml.zip</em>, ca. 50&nbsp;MB Upload; sie wird serverseitig entpackt),
+			alternativ die entpackte XML<?php else: ?> als entpackte XML-Datei (die PHP-Erweiterung &quot;zip&quot; ist auf
+			diesem Server nicht verf&uuml;gbar)<?php endif; ?> (<em>players_list_xml_foa.xml</em>, ca. 835&nbsp;MB Upload).</p>
+
+			<p>Die Datei enth&auml;lt die komplette Weltrangliste mit rund 1,9 Millionen Spielern; Upload und Import
+			laufen deshalb in kleinen Schritten und k&ouml;nnen einige Minuten dauern. Bitte das Browserfenster so lange
+			ge&ouml;ffnet lassen.</p>
+
+			<p class="tl_info">In die Liste <strong><?= $this->listenTitel ?></strong><?php if ($this->listenMonat): ?>
+			(Monat <?= $this->listenMonat ?>)<?php endif; ?> werden ausschlie&szlig;lich Spieler mit der
+			L&auml;nderkennung <strong><?= $this->laender ?></strong> &uuml;bernommen. Vorhandene Spieler dieser Liste
+			werden anhand der FIDE-ID &uuml;berschrieben; Spieler, die in der Datei nicht mehr vorkommen, werden aus
+			der Liste <strong>gel&ouml;scht</strong>. Andere Listen bleiben unber&uuml;hrt.</p>
+
+			<p><input type="file" id="eloDatei" accept=".xml,.zip,text/xml,application/zip"></p>
+			<p><button id="eloStart" class="tl_submit" disabled>Import starten</button></p>
+		</div>
+	</fieldset>
+
+	<fieldset class="tl_box" id="eloFortschritt" style="display:none">
+		<legend>Fortschritt</legend>
+		<div class="widget">
+			<p>1. Upload: <progress id="eloUploadBar" max="100" value="0" style="width:300px"></progress> <span id="eloUploadText">0&nbsp;%</span></p>
+			<p>2. Import: <progress id="eloImportBar" max="100" value="0" style="width:300px"></progress> <span id="eloImportText">0&nbsp;%</span></p>
+			<p id="eloStatus"></p>
+		</div>
+	</fieldset>
+
+	<fieldset class="tl_box" id="eloErgebnis" style="display:none">
+		<legend>Ergebnis</legend>
+		<div class="widget">
+			<table class="tl_listing">
+				<tr><td>Gelesene Spieler der Datei:</td><td style="text-align:right"><span id="eloErgGelesen">0</span></td></tr>
+				<tr><td>Davon &uuml;bersprungen (anderes Land oder ohne FIDE-ID):</td><td style="text-align:right"><span id="eloErgUebersprungen">0</span></td></tr>
+				<tr><td>Neu angelegt:</td><td style="text-align:right"><span id="eloErgNeu">0</span></td></tr>
+				<tr><td>Aktualisiert:</td><td style="text-align:right"><span id="eloErgAktualisiert">0</span></td></tr>
+				<tr><td>Unver&auml;ndert:</td><td style="text-align:right"><span id="eloErgUnveraendert">0</span></td></tr>
+				<tr><td>Aus der Liste gel&ouml;scht:</td><td style="text-align:right"><span id="eloErgGeloescht">0</span></td></tr>
+			</table>
+			<p><a href="<?= $this->zurueck ?>" class="tl_submit">Zur&uuml;ck zur &Uuml;bersicht</a></p>
+		</div>
+	</fieldset>
+
+	<fieldset class="tl_box" id="eloFehlerBox" style="display:none">
+		<legend>Fehler</legend>
+		<div class="widget">
+			<p class="tl_error" id="eloFehlerText"></p>
+			<p><button id="eloNeustart" class="tl_submit">Neu starten</button></p>
+		</div>
+	</fieldset>
+
+<?php endif; ?>
+
+</div>
+
+<?php if (!$this->listeFehlt): ?>
+<script>
+(function()
+{
+	var url = <?= json_encode(\Contao\Environment::get('request')) ?>;
+	var token = <?= json_encode($this->requestToken) ?>;
+	var BLOCK = 2 * 1024 * 1024; // Upload-Blockgröße: 2 MB
+
+	var eingabe = document.getElementById('eloDatei');
+	var startKnopf = document.getElementById('eloStart');
+
+	eingabe.addEventListener('change', function() { startKnopf.disabled = !eingabe.files.length; });
+
+	document.getElementById('eloNeustart').addEventListener('click', function() { location.reload(); });
+
+	function zeige(id, an) { document.getElementById(id).style.display = an ? '' : 'none'; }
+	function text(id, wert) { document.getElementById(id).textContent = wert; }
+	function balken(id, prozent) { document.getElementById(id).value = prozent; }
+
+	function fehler(meldung)
+	{
+		text('eloFehlerText', meldung);
+		zeige('eloFehlerBox', true);
+		text('eloStatus', 'Abgebrochen.');
+	}
+
+	async function post(fd)
+	{
+		fd.append('REQUEST_TOKEN', token);
+		// WICHTIG: KEIN X-Requested-With-Header — Contaos eigenes Ajax-System
+		// fängt solche Anfragen sonst mit "Missing Ajax action" ab, bevor der
+		// key=import-Callback überhaupt läuft
+		var antwort = await fetch(url, { method: 'POST', body: fd });
+		if(!antwort.ok) throw new Error('HTTP-Fehler ' + antwort.status);
+		return antwort.json();
+	}
+
+	// Datei blockweise hochladen
+	async function hochladen(datei)
+	{
+		var offset = 0;
+
+		while(offset < datei.size)
+		{
+			var fd = new FormData();
+			fd.append('eloAktion', 'upload');
+			fd.append('offset', offset);
+			fd.append('chunk', datei.slice(offset, offset + BLOCK), 'chunk.xml');
+
+			var res = await post(fd);
+			if(res.fehler) throw new Error(res.fehler);
+
+			offset = res.groesse;
+			var prozent = Math.round(offset / datei.size * 100);
+			balken('eloUploadBar', prozent);
+			text('eloUploadText', prozent + ' %');
+		}
+	}
+
+	// Import in Paketen ausführen. Der Lauf-Zeitstempel wird einmalig beim Start
+	// erzeugt und mit jedem Schritt mitgeschickt; der Server markiert damit die
+	// importierten Spieler und löscht am Ende die unmarkierten.
+	async function importieren()
+	{
+		var offset = 0;
+		var lauf = Math.floor(Date.now() / 1000);
+		var summe = { gelesen: 0, uebersprungen: 0, neu: 0, aktualisiert: 0, unveraendert: 0, geloescht: 0 };
+		var res;
+
+		do
+		{
+			var fd = new FormData();
+			fd.append('eloAktion', 'import');
+			fd.append('offset', offset);
+			fd.append('lauf', lauf);
+
+			res = await post(fd);
+			if(res.fehler) throw new Error(res.fehler);
+
+			offset = res.offset;
+			summe.gelesen += res.gelesen;
+			summe.uebersprungen += res.uebersprungen;
+			summe.neu += res.neu;
+			summe.aktualisiert += res.aktualisiert;
+			summe.unveraendert += res.unveraendert;
+			summe.geloescht += res.geloescht;
+
+			var prozent = res.gesamt > 0 ? Math.round(offset / res.gesamt * 100) : 100;
+			balken('eloImportBar', prozent);
+			text('eloImportText', prozent + ' %');
+			text('eloStatus', summe.gelesen.toLocaleString('de-DE') + ' Spieler gelesen, '
+				+ (summe.neu + summe.aktualisiert + summe.unveraendert).toLocaleString('de-DE') + ' übernommen …');
+		}
+		while(!res.fertig);
+
+		return summe;
+	}
+
+	startKnopf.addEventListener('click', async function()
+	{
+		var datei = eingabe.files[0];
+		if(!datei) return;
+
+		startKnopf.disabled = true;
+		eingabe.disabled = true;
+		zeige('eloFehlerBox', false);
+		zeige('eloFortschritt', true);
+		text('eloStatus', 'Datei wird hochgeladen …');
+
+		try
+		{
+			await hochladen(datei);
+			text('eloStatus', 'Import läuft …');
+			var summe = await importieren();
+
+			text('eloErgGelesen', summe.gelesen.toLocaleString('de-DE'));
+			text('eloErgUebersprungen', summe.uebersprungen.toLocaleString('de-DE'));
+			text('eloErgNeu', summe.neu.toLocaleString('de-DE'));
+			text('eloErgAktualisiert', summe.aktualisiert.toLocaleString('de-DE'));
+			text('eloErgUnveraendert', summe.unveraendert.toLocaleString('de-DE'));
+			text('eloErgGeloescht', summe.geloescht.toLocaleString('de-DE'));
+			zeige('eloErgebnis', true);
+			text('eloStatus', 'Import abgeschlossen.');
+		}
+		catch(e)
+		{
+			fehler(e.message || String(e));
+			startKnopf.disabled = false;
+			eingabe.disabled = false;
+		}
+	});
+})();
+</script>
+<?php endif; ?>

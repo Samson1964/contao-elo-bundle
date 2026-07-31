@@ -1,13 +1,14 @@
-# Quelle fuer die Metadaten im Contao Manager (contao/package-metadata).
-# Aenderungen hier werden von Claude in den Fork uebertragen.
+# Quelle für die Metadaten im Contao Manager (contao/package-metadata).
+# Änderungen hier werden von Claude in den Fork übertragen.
 # Der englische Block wird beim Abgleich ergaenzt, falls er fehlt.
 
 de:
     title: FIDE-Elo-Verwaltung
     description: >
-        Verwaltet FIDE-Elo-Listen und gibt Bestenlisten und Statistiken im Frontend aus. Noch nicht für den Praxiseinsatz geeignet, da die Elo-Liste der FIDE von Hand in die Datenbank importiert werden muss.
+        Verwaltet FIDE-Elo-Listen mit deutschen Spielern und gibt Toplisten, Bestenlisten und Statistiken im Frontend aus. Es können beliebig viele Monatslisten angelegt werden; die Ratingliste der FIDE wird als XML-Datei direkt im Backend in die jeweilige Liste importiert.
     keywords:
         - Schach
         - Elo
         - FIDE
         - Bestenliste
+        - Deutschland

@@ -1,124 +1,135 @@
 <?php
 
-/**
- * Contao Open Source CMS
+declare(strict_types=1);
+
+/*
+ * Dieses Bundle verwaltet FIDE-Elo-Listen in Contao 4.13 und Contao 5.
  *
- * Copyright (c) 2005-2015 Leo Feyer
- *
- * @package   Elo
- * @author    Frank Hoppe
- * @license   GNU/LPGL
- * @copyright Frank Hoppe 2016
+ * @license LGPL-3.0-or-later
  */
 
-
-/**
- * Namespace
- */
 namespace Schachbulle\ContaoEloBundle\Classes;
 
-/**
- * Class Elo
- *
- * @copyright  Frank Hoppe 2016
- * @author     Frank Hoppe
- * @package    Devtools
- */
-class Bestenliste extends \Module
-{
+use Contao\Database;
 
+/**
+ * Frontend-Modul "Ewige Elo-Bestenliste".
+ *
+ * Sucht über alle veröffentlichten Monatslisten hinweg für jeden Spieler die
+ * höchste je erreichte Elo-Zahl und stellt daraus eine Rangliste zusammen.
+ */
+class Bestenliste extends EloModul
+{
 	/**
-	 * Template
-	 * @var string
+	 * @var string Template des Moduls
 	 */
 	protected $strTemplate = 'mod_elobestenliste';
-	var $cache = false;
 
 	/**
-	 * Display a wildcard in the back end
-	 * @return string
+	 * @var string Text des Platzhalters im Backend
 	 */
-	public function generate()
+	protected $strPlatzhalter = '### ELO-BESTENLISTE ###';
+
+	/**
+	 * Haltbarkeit der zwischengespeicherten Auswertung in Sekunden (40 Tage).
+	 */
+	private const CACHEDAUER = 3600 * 24 * 40;
+
+	/**
+	 * Befüllt das Template mit der fertigen Tabelle.
+	 *
+	 * @return void
+	 */
+	protected function compile(): void
 	{
-		if (TL_MODE == 'BE')
-		{
-			$objTemplate = new \BackendTemplate('be_wildcard');
+		$schluessel = $this->elo_fromdate.'_'.$this->elo_todate.'_'.$this->elo_min.'_'.$this->elo_gender.'_'.$this->elo_topcount;
 
-			$objTemplate->wildcard = '### ELO-BESTENLISTE ###';
-			$objTemplate->title = $this->name;
-			$objTemplate->id = $this->id;
+		$result = Zwischenspeicher::hole('elo_bestenliste', $schluessel, self::CACHEDAUER, function (): array {
+			return $this->ermittle();
+		});
 
-			return $objTemplate->parse();
-		}
-
-		return parent::generate(); // Weitermachen mit dem Modul
+		$this->Template->content = $this->tabelle($result);
 	}
 
-
 	/**
-	 * Generate the module
+	 * Ermittelt je Spieler den höchsten Eintrag über alle Monatslisten.
+	 *
+	 * Die Abfrage sortiert absteigend nach Elo-Zahl; der erste Treffer eines
+	 * Spielers ist damit sein bester. Spieler mit der Inaktiv-Markierung der
+	 * FIDE bleiben außen vor.
+	 *
+	 * @return array<int,array<string,mixed>> Die Rangliste, absteigend sortiert
 	 */
-	protected function compile()
+	private function ermittle(): array
 	{
-		$cachetime = 3600 * 24 * 40; // 40 Tage
-		$cachekey = $this->elo_fromdate.'_'.$this->elo_todate.'_'.$this->elo_min.'_'.$this->elo_gender.'_'.$this->elo_topcount;
+		$sql = '';
 
-		// Cache initialisieren
-		$this->cache = new \Schachbulle\ContaoHelperBundle\Classes\Cache('Elobestenliste');
-		$this->cache->eraseExpired(); // Cache aufräumen, abgelaufene Schlüssel löschen
-
-		if($this->cache->isCached($cachekey))
+		// Die drei Werte stammen aus dem Modul-DCA und sind dort auf Ziffern
+		// bzw. eine Auswahl begrenzt; sie werden zusätzlich hart auf Zahlen
+		// gecastet, damit hier nichts Fremdes in die Abfrage gerät
+		if ($this->elo_fromdate)
 		{
-			// Daten aus dem Cache laden
-			$result = $this->cache->retrieve($cachekey);
+			$sql .= 'AND tl_elo_listen.listmonth >= '.(int) $this->elo_fromdate.' ';
 		}
-		else
+
+		if ($this->elo_todate)
 		{
-			$sql = '';
-			if($this->elo_fromdate) $sql .= 'AND tl_elo_listen.listmonth >= '.$this->elo_fromdate.' ';
-			if($this->elo_todate) $sql .= 'AND tl_elo_listen.listmonth <= '.$this->elo_todate.' ';
-			if($this->elo_gender == 'W') $sql .= 'AND tl_elo.sex = \'F\' ';
+			$sql .= 'AND tl_elo_listen.listmonth <= '.(int) $this->elo_todate.' ';
+		}
 
-			// Elo laden
-			$objElo = \Database::getInstance()->prepare('SELECT *, tl_elo_listen.title AS listentitel, tl_elo.title AS elotitel FROM tl_elo LEFT JOIN tl_elo_listen ON tl_elo.pid = tl_elo_listen.id WHERE tl_elo_listen.published = ? AND tl_elo.published = ? AND tl_elo_listen.listmonth > 0 AND tl_elo.rating >= ? AND tl_elo.flag NOT LIKE ? '.$sql.'ORDER BY tl_elo.rating DESC, tl_elo_listen.listmonth ASC')
-			//                                  ->limit(50)
-			                                  ->execute(1, 1, $this->elo_min, '%i%');
+		if ('W' === $this->elo_gender)
+		{
+			$sql .= "AND tl_elo.sex = 'F' ";
+		}
 
-			// Elo zuweisen
-			if($objElo->numRows > 1)
+		$objElo = Database::getInstance()
+			->prepare('SELECT *, tl_elo_listen.title AS listentitel, tl_elo.title AS elotitel FROM tl_elo LEFT JOIN tl_elo_listen ON tl_elo.pid = tl_elo_listen.id WHERE tl_elo_listen.published = ? AND tl_elo.published = ? AND tl_elo_listen.listmonth > 0 AND tl_elo.rating >= ? AND tl_elo.flag NOT LIKE ? '.$sql.'ORDER BY tl_elo.rating DESC, tl_elo_listen.listmonth ASC')
+			->execute('1', '1', (int) $this->elo_min, '%i%');
+
+		$result = array();
+		$ids = array();
+
+		while ($objElo->next())
+		{
+			// Je Spieler zählt nur der erste (= beste) Treffer
+			if (isset($ids[$objElo->fideid]))
 			{
-				$result = array();
-				$ids = array();
-				// Datensätze anzeigen
-				while($objElo->next())
-				{
-					if(!$ids[$objElo->fideid])
-					{
-						$line = $objElo->intent;
-						$line .= ($line) ? ' '.$objElo->prename : $objElo->prename;
-						$line .= ($line) ? ' '.$objElo->surname : $objElo->surname;
-						$result[] = array
-						(
-							'monat' => $objElo->listentitel,
-							'name'  => $line,
-							'elo'   => $objElo->rating,
-							'fid'   => $objElo->fideid,
-							'title' => ($objElo->fidetitel) ? $objElo->fidetitel . ' ' : (($objElo->w_title) ? $objElo->w_title . ' ': ''),
-						);
-						$ids[$objElo->fideid] = true;
-					}
-					// Ausgabe auf Top-X beschränken, wenn gewünscht
-					if($this->elo_topcount)
-					{
-						if(count($result) == $this->elo_topcount) break;
-					}
-				}
-				// Daten im Cache speichern
-				$this->cache->store($cachekey, $result, $cachetime);
+				continue;
+			}
+
+			$result[] = array
+			(
+				'monat' => $objElo->listentitel,
+				'name'  => trim($objElo->intent.' '.$objElo->prename.' '.$objElo->surname),
+				'elo'   => (int) $objElo->rating,
+				'fid'   => $objElo->fideid,
+				'title' => $objElo->elotitel ? $objElo->elotitel.' ' : ($objElo->w_title ? $objElo->w_title.' ' : ''),
+			);
+
+			$ids[$objElo->fideid] = true;
+
+			if ($this->elo_topcount && \count($result) >= (int) $this->elo_topcount)
+			{
+				break;
 			}
 		}
 
-		// Ausgabe schreiben
+		return $result;
+	}
+
+	/**
+	 * Baut die Ausgabetabelle.
+	 *
+	 * Bei gleicher Elo-Zahl bleibt die Platzziffer leer, damit Gleichstände als
+	 * solche erkennbar sind.
+	 *
+	 * @param array<int,array<string,mixed>> $result Die Rangliste
+	 *
+	 * @return string Die Tabelle als HTML; bei leerer Rangliste nur der
+	 *                Tabellenkopf
+	 */
+	private function tabelle(array $result): string
+	{
 		$content = '<table>';
 		$content .= '<tr>';
 		$content .= '<th class="head_0 col_first">Platz</th>';
@@ -127,31 +138,38 @@ class Bestenliste extends \Module
 		$content .= '<th class="head_3">Elo</th>';
 		$content .= '<th class="head_4 col_last">Monat</th>';
 		$content .= '</tr>';
+
 		$altelo = 0;
 		$odd = 'odd';
-		for($x = 0; $x < count($result); $x++)
+		$anzahl = \count($result);
+
+		for ($x = 0; $x < $anzahl; ++$x)
 		{
 			$class = 'row_'.$x.' ';
-			if($x == 0) $class .= 'row_first ';
-			elseif($x + 1 == count($result)) $class .= 'row_last ';
+
+			if (0 === $x)
+			{
+				$class .= 'row_first ';
+			}
+			elseif ($x + 1 === $anzahl)
+			{
+				$class .= 'row_last ';
+			}
+
 			$class .= $odd;
-			if($odd == 'odd') $odd = 'even';
-			else $odd = 'odd';
+			$odd = ('odd' === $odd) ? 'even' : 'odd';
 
 			$content .= '<tr class="'.$class.'">';
-			if($altelo == $result[$x]['elo']) $content .= '<th class="col_0 col_first place"></th>';
-			else $content .= '<th class="col_0 col_first place">'.($x+1).'</th>';
+			$content .= '<th class="col_0 col_first place">'.($altelo === $result[$x]['elo'] ? '' : $x + 1).'</th>';
 			$content .= '<td class="col_1 name">'.$result[$x]['name'].'</td>';
 			$content .= '<td class="col_2 titel">'.$result[$x]['title'].'</td>';
 			$content .= '<td class="col_3 elo">'.$result[$x]['elo'].'</td>';
 			$content .= '<td class="col_4 col_last monat">'.$result[$x]['monat'].'</td>';
 			$content .= '</tr>';
+
 			$altelo = $result[$x]['elo'];
 		}
-		$content .= '</table>';
 
-		$this->Template->content = $content;
-
+		return $content.'</table>';
 	}
-
 }

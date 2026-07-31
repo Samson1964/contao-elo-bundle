@@ -36,4 +36,9 @@ $GLOBALS['TL_LANG']['tl_elo_listen']['toggle'][0] = 'Liste aktivieren/deaktivier
 $GLOBALS['TL_LANG']['tl_elo_listen']['toggle'][1] = 'Liste %s aktivieren/deaktivieren';
 
 $GLOBALS['TL_LANG']['tl_elo_listen']['show'][0] = 'Listendetails anzeigen';
-$GLOBALS['TL_LANG']['tl_elo_listen']['show'][1] = 'Details des Listen %s anzeigen';
+$GLOBALS['TL_LANG']['tl_elo_listen']['show'][1] = 'Details der Liste %s anzeigen';
+
+// Zusätzliche Funktionen
+$GLOBALS['TL_LANG']['tl_elo_listen']['import'][0] = 'FIDE-Daten importieren';
+$GLOBALS['TL_LANG']['tl_elo_listen']['import'][1] = 'FIDE-Daten in die Liste %s importieren';
+$GLOBALS['TL_LANG']['tl_elo_listen']['importConfirm'] = 'Sollen die FIDE-Daten wirklich in diese Liste importiert werden? Vorhandene Spieler der Liste werden dabei überschrieben und Spieler, die in der Importdatei fehlen, gelöscht.';

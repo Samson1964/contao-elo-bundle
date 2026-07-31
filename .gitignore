@@ -1,2 +1,4 @@
 *.sql
 *.xml
+/vendor/
+.phpunit.result.cache

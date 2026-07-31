@@ -1,7 +1,7 @@
 {
     "name": "schachbulle/contao-elo-bundle",
     "type": "contao-bundle",
-    "description": "Verwaltet FIDE-Elo-Listen und gibt Bestenlisten und Statistiken im Frontend aus. Noch nicht für den Praxiseinsatz geeignet, da die Elo-Liste der FIDE von Hand in die Datenbank importiert werden muss.",
+    "description": "Verwaltet FIDE-Elo-Listen mit deutschen Spielern und gibt Toplisten, Bestenlisten und Statistiken im Frontend aus. Die Ratingliste der FIDE wird als XML direkt im Backend importiert.",
     "keywords": [
         "contao",
         "schach",
@@ -18,10 +18,12 @@
         }
     ],
     "require": {
-        "php": "^5.6 || ^7.0 || ^8.0",
-        "contao/core-bundle": "^4",
-        "codefog/contao-haste": "*",
-        "schachbulle/contao-helper-bundle": "*"
+        "php": "^7.4 || ^8.0",
+        "contao/core-bundle": "^4.13 || ^5.0",
+        "symfony/cache": "^5.4 || ^6.0 || ^7.0",
+        "symfony/config": "^5.4 || ^6.0 || ^7.0",
+        "symfony/dependency-injection": "^5.4 || ^6.0 || ^7.0",
+        "symfony/http-kernel": "^5.4 || ^6.0 || ^7.0"
     },
     "conflict": {
         "contao/core": "*",

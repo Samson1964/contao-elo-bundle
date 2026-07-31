@@ -1,16 +1,15 @@
 <?php
-/**
- * Avatar for Contao Open Source CMS
+
+declare(strict_types=1);
+
+/*
+ * Dieses Bundle verwaltet FIDE-Elo-Listen in Contao 4.13 und Contao 5.
  *
- * Copyright (C) 2013 Kirsten Roschanski
- * Copyright (C) 2013 Tristan Lins <http://bit3.de>
- *
- * @package    Avatar
- * @license    http://opensource.org/licenses/lgpl-3.0.html LGPL
+ * @license LGPL-3.0-or-later
  */
 
-/**
- * Add palette to tl_module
+/*
+ * Erweiterung von tl_module um die vier Frontend-Module des Bundles.
  */
 $GLOBALS['TL_DCA']['tl_module']['palettes']['elo_toplist']   = '{title_legend},name,headline,type;{options_legend},elo_topcount;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';
 $GLOBALS['TL_DCA']['tl_module']['palettes']['elo_bestlist']  = '{title_legend},name,headline,type;{options_legend},elo_fromdate,elo_todate,elo_min,elo_gender,elo_topcount;{template_legend:hide},customTpl;{protected_legend:hide},protected;{expert_legend:hide},guests,cssID';

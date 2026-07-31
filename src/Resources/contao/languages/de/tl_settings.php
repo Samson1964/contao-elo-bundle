@@ -1,4 +1,7 @@
-<?php if (!defined('TL_ROOT')) die('You cannot access this file directly!');
+<?php
+
+// Der frühere Schutz per TL_ROOT ist entfallen: Die Konstante gibt es in
+// Contao 5 nicht mehr, die Datei hätte dort die Anfrage abgebrochen.
 
 /**
  * Contao Open Source CMS

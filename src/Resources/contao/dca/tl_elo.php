@@ -1,28 +1,33 @@
 <?php
 
-/**
- * Contao Open Source CMS
+declare(strict_types=1);
+
+/*
+ * Dieses Bundle verwaltet FIDE-Elo-Listen in Contao 4.13 und Contao 5.
  *
- * Copyright (c) 2005-2015 Leo Feyer
- *
- * @package   Elo
- * @author    Frank Hoppe
- * @license   GNU/LPGL
- * @copyright Frank Hoppe 2016
+ * @license LGPL-3.0-or-later
  */
 
+use Contao\DC_Table;
+use Schachbulle\ContaoEloBundle\ContaoEloBundle;
 
 /**
- * Table tl_elo
+ * Tabelle tl_elo
+ *
+ * Kindtabelle von tl_elo_listen: Ein Datensatz ist ein Spieler einer
+ * FIDE-Monatsliste. Die Felder bilden die Spalten der FIDE-XML ab; "pid"
+ * verweist auf die Liste, zu der der Spieler gehört.
  */
 $GLOBALS['TL_DCA']['tl_elo'] = array
 (
 
-	// Config
+	// Konfiguration
 	'config' => array
 	(
-		'dataContainer'             => 'Table',
-		'ptable'					=> 'tl_elo_listen',
+		// Contao 5 erwartet den vollqualifizierten Klassennamen; Contao 4.13 versteht
+		// ihn seit 4.9 ebenfalls und verwarnt umgekehrt den Kurznamen "Table"
+		'dataContainer'             => DC_Table::class,
+		'ptable'                    => 'tl_elo_listen',
 		'enableVersioning'          => true,
 		'sql' => array
 		(
@@ -43,105 +48,42 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 		)
 	),
 
-	// List
+	// Datensätze auflisten
 	'list' => array
 	(
 		'sorting' => array
 		(
-			'mode'                    => 4,
+			'mode'                    => 4, // DataContainer::MODE_PARENT
 			'fields'                  => array('surname'),
-			'flag'                    => 1,
-			'headerFields'            => array('title', 'datum'), 
+			'flag'                    => 1, // DataContainer::SORT_INITIAL_LETTER_ASC
+			// Kopfzeile der Elternansicht: Daten der Liste, zu der die Spieler gehören
+			'headerFields'            => array('title', 'listmonth', 'datum'),
 			'panelLayout'             => 'sort,filter;search,limit',
-			'child_record_callback'   => array('tl_elo', 'listPlayers'),
 			'child_record_class'      => 'no_padding',
+			// Die Zeilendarstellung wird weiter unten versionsabhängig gesetzt
 		),
 		'label' => array
 		(
 			'fields'                  => array('surname', 'prename'),
-			'showColumns'             => true,
 			'format'                  => '%s'
 		),
-		'global_operations' => array
-		(
-			'all' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
-				'href'                => 'act=select',
-				'class'               => 'header_edit_all',
-				'attributes'          => 'onclick="Backend.getScrollOffset();" accesskey="e"'
-			)
-		),
-		'operations' => array
-		(
-			'edit' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_elo']['edit'],
-				'href'                => 'act=edit',
-				'icon'                => 'edit.gif'
-			),
-			'copy' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_elo']['copy'],
-				'href'                => 'act=copy',
-				'icon'                => 'copy.gif'
-			),
-			'delete' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_elo']['delete'],
-				'href'                => 'act=delete',
-				'icon'                => 'delete.gif',
-				'attributes'          => 'onclick="if(!confirm(\'' . ($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? null) . '\'))return false;Backend.getScrollOffset()"'
-			),
-			'toggle' => array
-			(
-				'label'                => &$GLOBALS['TL_LANG']['tl_elo']['toggle'],
-				'attributes'           => 'onclick="Backend.getScrollOffset()"',
-				'haste_ajax_operation' => array
-				(
-					'field'            => 'published',
-					'options'          => array
-					(
-						array('value' => '', 'icon' => 'invisible.svg'),
-						array('value' => '1', 'icon' => 'visible.svg'),
-					),
-				),
-			),
-			'show' => array
-			(
-				'label'               => &$GLOBALS['TL_LANG']['tl_elo']['show'],
-				'href'                => 'act=show',
-				'icon'                => 'show.gif'
-			)
-		)
+		// global_operations und operations werden weiter unten versionsabhängig gesetzt
 	),
 
-	// Select
-	'select' => array
-	(
-		'buttons_callback' => array()
-	),
-
-	// Edit
-	'edit' => array
-	(
-		'buttons_callback' => array()
-	),
-
-	// Palettes
+	// Paletten
 	'palettes' => array
 	(
 		'__selector__'                => array(''),
 		'default'                     => '{name_legend},surname,prename,intent,birthday,sex,country;{fide_legend},fideid,title,w_title,o_title,foa_title;{flag_legend},flag,rapid_flag,blitz_flag;{elo_legend},rating,games,rapid_rating,rapid_games,blitz_rating,blitz_games;{publish_legend},published'
 	),
 
-	// Subpalettes
+	// Unterpaletten
 	'subpalettes' => array
 	(
 		''                            => ''
 	),
 
-	// Fields
+	// Felder
 	'fields' => array
 	(
 		'id' => array
@@ -163,7 +105,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 16,
 				'tl_class'            => 'w50'
 			),
@@ -177,7 +119,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 64,
 				'tl_class'            => 'w50'
 			),
@@ -191,7 +133,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 64,
 				'tl_class'            => 'w50'
 			),
@@ -204,7 +146,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 16,
 				'tl_class'            => 'w50'
 			),
@@ -214,10 +156,11 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_elo']['country'],
 			'exclude'                 => true,
+			'filter'                  => true,
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 3,
 				'tl_class'            => 'w50'
 			),
@@ -230,7 +173,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 1,
 				'tl_class'            => 'w50'
 			),
@@ -244,7 +187,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 3,
 				'tl_class'            => 'w50 clr'
 			),
@@ -258,7 +201,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 3,
 				'tl_class'            => 'w50'
 			),
@@ -272,7 +215,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 3,
 				'tl_class'            => 'w50'
 			),
@@ -286,7 +229,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 3,
 				'tl_class'            => 'w50'
 			),
@@ -299,7 +242,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 8,
 				'tl_class'            => 'w50'
 			),
@@ -312,7 +255,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 8,
 				'tl_class'            => 'w50 clr'
 			),
@@ -325,7 +268,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 8,
 				'tl_class'            => 'w50 clr'
 			),
@@ -338,7 +281,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 4,
 				'tl_class'            => 'w50'
 			),
@@ -351,7 +294,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 4,
 				'tl_class'            => 'w50'
 			),
@@ -364,7 +307,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 4,
 				'tl_class'            => 'w50'
 			),
@@ -377,7 +320,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 4,
 				'tl_class'            => 'w50'
 			),
@@ -390,7 +333,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 4,
 				'tl_class'            => 'w50'
 			),
@@ -403,7 +346,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 4,
 				'tl_class'            => 'w50'
 			),
@@ -416,7 +359,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 			'inputType'               => 'text',
 			'eval'                    => array
 			(
-				'mandatory'           => false, 
+				'mandatory'           => false,
 				'maxlength'           => 8,
 				'tl_class'            => 'w50'
 			),
@@ -425,6 +368,7 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 		'published' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_elo']['published'],
+			'toggle'                  => true, // Aktiviert den Contao-eigenen Schnellschalter in der Übersicht
 			'exclude'                 => true,
 			'search'                  => false,
 			'sorting'                 => false,
@@ -436,44 +380,178 @@ $GLOBALS['TL_DCA']['tl_elo'] = array
 				'isBoolean'           => true
 			),
 			'sql'                     => "char(1) NOT NULL default ''"
-		), 
+		),
 	)
 );
 
-/**
- * Provide miscellaneous methods that are used by the data configuration array
+/*
+ * Zeilendarstellung und Operationen versionsabhängig setzen.
+ *
+ * Die Zeile der Elternansicht baut in beiden Fällen tl_elo::zeile() zusammen,
+ * angesprochen wird sie aber unterschiedlich: Contao 4.13 kennt nur den
+ * child_record_callback, Contao 5.7 verwarnt diesen und erwartet stattdessen
+ * einen label_callback. Die beiden Einstiegsmethoden unterscheiden sich nur
+ * darin, dass Contao 4.13 fertiges HTML einsetzt und Contao 5 reinen Text.
+ *
+ * Bei den Operationen kennt Contao 5 die Kurzschreibweise, bei der Label und
+ * Icon aus dem Kern stammen; Contao 4.13 benötigt vollständige Arrays. Der
+ * Toggler läuft in beiden Versionen über das Contao-eigene "act=toggle" — die
+ * frühere Umsetzung über codefog/contao-haste ist entfallen, weil Haste nicht
+ * für Contao 5 verfügbar ist.
  */
-class tl_elo extends Backend
+if (ContaoEloBundle::isContao5())
 {
-	 
+	$GLOBALS['TL_DCA']['tl_elo']['list']['label']['label_callback'] = array('tl_elo', 'listPlayersLabel');
+
+	$GLOBALS['TL_DCA']['tl_elo']['list']['global_operations'] = array
+	(
+		'all'
+	);
+
+	$GLOBALS['TL_DCA']['tl_elo']['list']['operations'] = array
+	(
+		'edit',
+		'copy',
+		'delete',
+		'toggle',
+		'show'
+	);
+}
+else
+{
+	$GLOBALS['TL_DCA']['tl_elo']['list']['sorting']['child_record_callback'] = array('tl_elo', 'listPlayers');
+
+	$GLOBALS['TL_DCA']['tl_elo']['list']['global_operations'] = array
+	(
+		'all' => array
+		(
+			'label'               => &$GLOBALS['TL_LANG']['MSC']['all'],
+			'href'                => 'act=select',
+			'class'               => 'header_edit_all',
+			'attributes'          => 'onclick="Backend.getScrollOffset();" accesskey="e"'
+		)
+	);
+
+	$GLOBALS['TL_DCA']['tl_elo']['list']['operations'] = array
+	(
+		'edit' => array
+		(
+			'label'               => &$GLOBALS['TL_LANG']['tl_elo']['edit'],
+			'href'                => 'act=edit',
+			'icon'                => 'edit.svg'
+		),
+		'copy' => array
+		(
+			'label'               => &$GLOBALS['TL_LANG']['tl_elo']['copy'],
+			'href'                => 'act=copy',
+			'icon'                => 'copy.svg'
+		),
+		'delete' => array
+		(
+			'label'               => &$GLOBALS['TL_LANG']['tl_elo']['delete'],
+			'href'                => 'act=delete',
+			'icon'                => 'delete.svg',
+			'attributes'          => 'onclick="if(!confirm(\''.($GLOBALS['TL_LANG']['MSC']['deleteConfirm'] ?? '').'\'))return false;Backend.getScrollOffset()"'
+		),
+		'toggle' => array
+		(
+			'label'               => &$GLOBALS['TL_LANG']['tl_elo']['toggle'],
+			'href'                => 'act=toggle&amp;field=published',
+			'icon'                => 'visible.svg'
+		),
+		'show' => array
+		(
+			'label'               => &$GLOBALS['TL_LANG']['tl_elo']['show'],
+			'href'                => 'act=show',
+			'icon'                => 'show.svg'
+		)
+	);
+}
+
+/**
+ * Stellt die Zeilendarstellung der Elternansicht bereit.
+ *
+ * Die Klasse erbt bewusst nicht von Contao\Backend: Sie braucht nichts daraus,
+ * und der Klassenalias "Backend" ohne Namensraum existiert in Contao 5 nicht
+ * mehr. Contao erzeugt sie über System::importStatic(), wofür ein öffentlicher
+ * Konstruktor genügt.
+ */
+class tl_elo
+{
 	/**
-	 * Import the back end user object
+	 * Baut die Zeile eines Spielers für die Elternansicht in Contao 4.13.
+	 *
+	 * Contao setzt den Rückgabewert als fertiges HTML in die Zeile ein, deshalb
+	 * das umschließende div.
+	 *
+	 * @param array $arrRow Der Datensatz des Spielers
+	 *
+	 * @return string Die Zeile als HTML
 	 */
-	public function __construct()
+	public function listPlayers($arrRow): string
 	{
-		parent::__construct();
-		$this->import('BackendUser', 'User');
+		return '<div>'.$this->zeile($arrRow)."</div>\n";
 	}
 
-    /**
-     * Generiere eine Zeile als HTML
-     * @param array
-     * @return string
-     */
-    public function listPlayers($arrRow)
-    {
-        $line = '';
-        $line .= '<div>';
-        $line .= $arrRow['surname'];
-        if($arrRow['prename']) $line .= ', '.$arrRow['prename'];
-        if($arrRow['intent']) $line .= ', '.$arrRow['intent'];
-        if($arrRow['rating']) $line .= ' - Elo '.$arrRow['rating'];
-        if($arrRow['blitz_rating']) $line .= ' - Blitz '.$arrRow['blitz_rating'];
-        if($arrRow['rapid_rating']) $line .= ' - Rapid '.$arrRow['rapid_rating'];
-        $line .= "</div>";
-        $line .= "\n";
-        return($line);
+	/**
+	 * Baut die Zeile eines Spielers für die Elternansicht in Contao 5.
+	 *
+	 * Contao 5 erwartet an dieser Stelle reinen Text und kümmert sich selbst um
+	 * das Markup der Zeile.
+	 *
+	 * @param array       $arrRow Der Datensatz des Spielers
+	 * @param string      $strLabel Das von Contao aus label.fields vorbereitete
+	 *                              Label; wird hier durch die eigene Zeile ersetzt
+	 * @param object|null $dc     Der DataContainer, hier nicht benötigt
+	 * @param array       $args   Die einzelnen Label-Felder, hier nicht benötigt
+	 *
+	 * @return string Die Zeile als Text
+	 */
+	public function listPlayersLabel($arrRow, $strLabel = '', $dc = null, $args = array()): string
+	{
+		return $this->zeile($arrRow);
+	}
 
-    }
+	/**
+	 * Setzt die Beschreibung eines Spielers zusammen.
+	 *
+	 * Ausgegeben werden Name und die vorhandenen Wertungszahlen. Fehlende Werte
+	 * werden weggelassen, damit die Zeile bei einem Spieler ohne Blitz- oder
+	 * Schnellschach-Elo nicht mit leeren Angaben endet.
+	 *
+	 * @param array $arrRow Der Datensatz des Spielers
+	 *
+	 * @return string Die zusammengesetzte Zeile ohne Markup
+	 */
+	private function zeile($arrRow): string
+	{
+		$line = (string) ($arrRow['surname'] ?? '');
 
+		if ($arrRow['prename'] ?? '')
+		{
+			$line .= ', '.$arrRow['prename'];
+		}
+
+		if ($arrRow['intent'] ?? '')
+		{
+			$line .= ', '.$arrRow['intent'];
+		}
+
+		if ($arrRow['rating'] ?? 0)
+		{
+			$line .= ' - Elo '.$arrRow['rating'];
+		}
+
+		if ($arrRow['blitz_rating'] ?? 0)
+		{
+			$line .= ' - Blitz '.$arrRow['blitz_rating'];
+		}
+
+		if ($arrRow['rapid_rating'] ?? 0)
+		{
+			$line .= ' - Rapid '.$arrRow['rapid_rating'];
+		}
+
+		return $line;
+	}
 }

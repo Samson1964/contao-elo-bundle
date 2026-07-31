@@ -1,60 +1,61 @@
 <?php
 
-/**
- * Contao Open Source CMS
+declare(strict_types=1);
+
+/*
+ * Dieses Bundle verwaltet FIDE-Elo-Listen in Contao 4.13 und Contao 5.
  *
- * Copyright (c) 2005-2015 Leo Feyer
- *
- * @package   Elo
- * @author    Frank Hoppe
- * @license   GNU/LPGL
- * @copyright Frank Hoppe 2016
+ * @license LGPL-3.0-or-later
  */
 
+use Schachbulle\ContaoEloBundle\Classes\Bestenliste;
+use Schachbulle\ContaoEloBundle\Classes\Elo;
+use Schachbulle\ContaoEloBundle\Classes\FideImport;
+use Schachbulle\ContaoEloBundle\Classes\Statistik;
+use Schachbulle\ContaoEloBundle\Classes\TopX;
+use Schachbulle\ContaoEloBundle\ContentElements\EloArchiv;
 
-/**
- * BACK END MODULES
+/*
+ * Backend-Modul
  *
- * Back end modules are stored in a global array called "BE_MOD". You can add
- * your own modules by adding them to the array.
- *
- * Not all of the keys mentioned above (like "tables", "key", "callback" etc.)
- * have to be set. Take a look at the system/modules/core/config/config.php
- * file to see how back end modules are configured.
- */
-
-/**
- * Backend-Module
+ * Beide Tabellen gehören zum selben Modul: tl_elo ist die Kindtabelle von
+ * tl_elo_listen und wird über die Operation "Spieler der Liste bearbeiten"
+ * geöffnet. Contao lässt dabei nur Tabellen zu, die hier eingetragen sind.
  */
 $GLOBALS['BE_MOD']['content']['elo'] = array
 (
 	'tables'                  => array('tl_elo_listen', 'tl_elo'),
-	'icon'                    => 'bundles/contaoelo/images/icon.png'
+	'icon'                    => 'bundles/contaoelo/images/icon.svg',
+
+	// Operation "FIDE-Daten importieren" am Listendatensatz (key=import&id=<Liste>).
+	// Contao holt die Klasse über System::importStatic() aus dem Service-Container,
+	// weil sie in der services.yaml unter ihrem Klassennamen registriert ist.
+	'import'                  => array(FideImport::class, 'run')
 );
 
-
-/**
+/*
  * Frontend-Module
+ *
+ * Die Registrierung über $GLOBALS['FE_MOD'] funktioniert in Contao 4.13 und
+ * Contao 5 gleichermaßen; die Klassen erben weiterhin von Contao\Module.
  */
-
 $GLOBALS['FE_MOD']['elo'] = array
 (
-	'elo_toplist'             => 'Schachbulle\ContaoEloBundle\Classes\Elo',
-	'elo_bestlist'            => 'Schachbulle\ContaoEloBundle\Classes\Bestenliste',
-	'elo_topx'                => 'Schachbulle\ContaoEloBundle\Classes\TopX',
-	'elo_statistik'           => 'Schachbulle\ContaoEloBundle\Classes\Statistik',
+	'elo_toplist'             => Elo::class,
+	'elo_bestlist'            => Bestenliste::class,
+	'elo_topx'                => TopX::class,
+	'elo_statistik'           => Statistik::class,
 );
 
-/**
+/*
  * Inhaltselemente
  */
+$GLOBALS['TL_CTE']['schach']['eloliste'] = EloArchiv::class;
 
-$GLOBALS['TL_CTE']['schach']['eloliste'] = 'Schachbulle\ContaoEloBundle\ContentElements\EloArchiv'; 
-
-/**
- * -------------------------------------------------------------------------
+/*
  * Voreinstellungen
- * -------------------------------------------------------------------------
+ *
+ * Cachedauer der Frontend-Ausgaben in Tagen; einstellbar in den
+ * Contao-Einstellungen (tl_settings).
  */
- 
 $GLOBALS['TL_CONFIG']['eloliste_cachetime'] = 30;

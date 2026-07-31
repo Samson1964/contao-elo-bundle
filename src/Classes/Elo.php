@@ -1,159 +1,199 @@
 <?php
 
-/**
- * Contao Open Source CMS
+declare(strict_types=1);
+
+/*
+ * Dieses Bundle verwaltet FIDE-Elo-Listen in Contao 4.13 und Contao 5.
  *
- * Copyright (c) 2005-2015 Leo Feyer
- *
- * @package   Elo
- * @author    Frank Hoppe
- * @license   GNU/LPGL
- * @copyright Frank Hoppe 2016
+ * @license LGPL-3.0-or-later
  */
 
-
-/**
- * Namespace
- */
 namespace Schachbulle\ContaoEloBundle\Classes;
 
-/**
- * Class Elo
- *
- * @copyright  Frank Hoppe 2016
- * @author     Frank Hoppe
- * @package    Devtools
- */
-class Elo extends \Module
-{
+use Contao\Database;
 
+/**
+ * Frontend-Modul "Elo-Topliste eines Monats".
+ *
+ * Zeigt aus der jüngsten veröffentlichten Elo-Liste die besten Spieler in
+ * sechs Wertungen: Normal-, Schnell- und Blitzschach, jeweils gesamt und
+ * für Frauen.
+ */
+class Elo extends EloModul
+{
 	/**
-	 * Template
-	 * @var string
+	 * @var string Template des Moduls
 	 */
 	protected $strTemplate = 'mod_elo';
-	var $cache = false;
 
 	/**
-	 * Display a wildcard in the back end
-	 * @return string
+	 * @var string Text des Platzhalters im Backend
 	 */
-	public function generate()
-	{
-		if (TL_MODE == 'BE')
-		{
-			$objTemplate = new \BackendTemplate('be_wildcard');
-
-			$objTemplate->wildcard = '### ELO-LISTE ###';
-			$objTemplate->title = $this->name;
-			$objTemplate->id = $this->id;
-
-			return $objTemplate->parse();
-		}
-		
-		return parent::generate(); // Weitermachen mit dem Modul
-	}
-
+	protected $strPlatzhalter = '### ELO-LISTE ###';
 
 	/**
-	 * Generate the module
+	 * Haltbarkeit der zwischengespeicherten Auswertungen in Sekunden.
+	 *
+	 * Vierzig Tage, damit eine Auswertung bis zur nächsten Monatsliste der FIDE
+	 * gültig bleibt.
 	 */
-	protected function compile()
+	private const CACHEDAUER = 3600 * 24 * 40;
+
+	/**
+	 * Befüllt das Template.
+	 *
+	 * Ohne veröffentlichte Liste bleibt die Ausgabe leer statt mit einem Fehler
+	 * abzubrechen — im Frontend soll eine noch nicht gepflegte Elo-Verwaltung
+	 * die Seite nicht zerstören.
+	 *
+	 * @return void
+	 */
+	protected function compile(): void
 	{
-		$cachetime = 3600 * 24 * 40; // 40 Tage
-
-		// Aktuelle Liste ermitteln
-		$objActiv = \Database::getInstance()->prepare('SELECT * FROM tl_elo_listen WHERE published=? ORDER BY datum DESC')
-		                                    ->limit(1)
-		                                    ->execute(1);
-
-		// Cache initialisieren
-		$this->cache = new \Schachbulle\ContaoHelperBundle\Classes\Cache('Elo');
-		$this->cache->eraseExpired(); // Cache aufräumen, abgelaufene Schlüssel löschen
+		$objActiv = Database::getInstance()
+			->prepare('SELECT id, title, datum FROM tl_elo_listen WHERE published=? ORDER BY datum DESC')
+			->limit(1)
+			->execute('1');
 
 		$this->Template->headline = 'FIDE-Ratingliste Deutschland';
 		$this->Template->hl = 'h2';
-		$this->Template->datum = date('d.m.Y', $objActiv->datum).' ('.$objActiv->title.')';
 
+		// Die sechs Wertungen werden immer gesetzt, auch wenn es keine Liste
+		// gibt: Das Template läuft in jedem Fall per foreach darüber
+		foreach (array('eloN', 'eloB', 'eloR', 'eloNw', 'eloBw', 'eloRw') as $typ)
+		{
+			$this->Template->{$typ} = $objActiv->numRows
+				? $this->getEloliste((int) $objActiv->id, $typ, (int) $this->elo_topcount)
+				: array();
+		}
+
+		if (!$objActiv->numRows)
+		{
+			$this->Template->datum = '';
+			$this->Template->count = 0;
+
+			return;
+		}
+
+		$this->Template->datum = date('d.m.Y', (int) $objActiv->datum).' ('.$objActiv->title.')';
 		$this->Template->count = $this->elo_topcount;
-		$this->Template->eloN = $this->getEloliste($objActiv->id, 'eloN', $this->elo_topcount);
-		$this->Template->eloB = $this->getEloliste($objActiv->id, 'eloB', $this->elo_topcount);
-		$this->Template->eloR = $this->getEloliste($objActiv->id, 'eloR', $this->elo_topcount);
-		$this->Template->eloNw = $this->getEloliste($objActiv->id, 'eloNw', $this->elo_topcount);
-		$this->Template->eloBw = $this->getEloliste($objActiv->id, 'eloBw', $this->elo_topcount);
-		$this->Template->eloRw = $this->getEloliste($objActiv->id, 'eloRw', $this->elo_topcount);
-
 	}
 
 	/**
-	 * Eloliste aus Datenbank laden
-	 * @param integer $listid         ID der Eloliste
-	 * @param string $listtyp         Typ der Eloliste
-	 * @param integer $count          Anzahl der Topeinträge der Eloliste
-	 * @return array                  Gefundene Datensätze
+	 * Lädt die besten Spieler einer Liste in einer bestimmten Wertung.
+	 *
+	 * Spieler mit der Inaktiv-Markierung der FIDE ("i" im Feld flag) bleiben
+	 * außen vor, damit die Topliste den aktuellen Spielbetrieb abbildet.
+	 *
+	 * @param int    $listid   ID der Elo-Liste in tl_elo_listen
+	 * @param string $listtype Wertung: eloN, eloB, eloR jeweils gesamt,
+	 *                         mit angehängtem "w" nur Frauen
+	 * @param int    $count    Anzahl der gewünschten Plätze
+	 *
+	 * @return array<int,array<string,mixed>> Die Spieler in der Reihenfolge der
+	 *                                        Wertung; leer, wenn die Liste keine
+	 *                                        passenden Spieler enthält
 	 */
-	function getEloliste($listid, $listtype, $count)
+	private function getEloliste(int $listid, string $listtype, int $count): array
 	{
+		$sortierung = $this->sortierung($listtype);
 
-		switch($listtype)
+		if ('' === $sortierung)
 		{
-			case 'eloN':
-				$sql = 'ORDER BY rating DESC';
-				break;
-			case 'eloB':
-				$sql = 'ORDER BY blitz_rating DESC';
-				break;
-			case 'eloR':
-				$sql = 'ORDER BY rapid_rating DESC';
-				break;
-			case 'eloNw':
-				$sql = 'AND sex=\'F\' ORDER BY rating DESC';
-				break;
-			case 'eloBw':
-				$sql = 'AND sex=\'F\' ORDER BY blitz_rating DESC';
-				break;
-			case 'eloRw':
-				$sql = 'AND sex=\'F\' ORDER BY rapid_rating DESC';
-				break;
-			default:
+			return array();
 		}
 
-		$cachekey = $listtype.'_'.$count.'_'.$listid;
+		return Zwischenspeicher::hole(
+			'elo_topliste',
+			$listtype.'_'.$count.'_'.$listid,
+			self::CACHEDAUER,
+			function () use ($listid, $listtype, $count, $sortierung): array {
+				$objElo = Database::getInstance()
+					->prepare('SELECT * FROM tl_elo WHERE pid=? AND published=? AND flag NOT LIKE ? '.$sortierung)
+					->limit($count)
+					->execute($listid, '1', '%i%');
 
-		if($this->cache->isCached($cachekey))
-		{
-			// Daten aus dem Cache laden
-			$result = $this->cache->retrieve($cachekey);
-		}
-		else
-		{
-			// Daten aus der Datenbank laden
-			$objElo = \Database::getInstance()->prepare('SELECT * FROM tl_elo WHERE pid=? AND published=? AND flag NOT LIKE ? '.$sql)
-			                                  ->limit($count)
-			                                  ->execute($listid, 1, '%i%');
-			// Elo zuweisen
-			if($objElo->numRows > 1)
-			{
 				$result = array();
-				// Datensätze anzeigen
-				while($objElo->next()) 
+
+				while ($objElo->next())
 				{
-					$line = $objElo->intent;
-					$line .= ($line) ? ' '.$objElo->prename : $objElo->prename; 
-					$line .= ($line) ? ' '.$objElo->surname : $objElo->surname; 
 					$result[] = array
 					(
-						'name' 	=> $line,
-						'elo'  	=> (substr($listtype,0,4) == 'eloN') ? $objElo->rating : ((substr($listtype,0,4) == 'eloB') ? $objElo->blitz_rating : $objElo->rapid_rating),
-						'fid' 	=> $objElo->fideid,
-						'title'	=> ($objElo->title) ? $objElo->title . ' ' : (($objElo->w_title) ? $objElo->w_title . ' ': ''),
+						'name'  => $this->name($objElo),
+						'elo'   => $this->wertung($objElo, $listtype),
+						'fid'   => $objElo->fideid,
+						'title' => $objElo->title ? $objElo->title.' ' : ($objElo->w_title ? $objElo->w_title.' ' : ''),
 					);
 				}
-				// Daten im Cache speichern
-				$this->cache->store($cachekey, $result, $cachetime);
+
+				return $result;
 			}
+		);
+	}
+
+	/**
+	 * Liefert die Sortierung samt Zusatzbedingung zur gewünschten Wertung.
+	 *
+	 * @param string $listtype Kennung der Wertung
+	 *
+	 * @return string Der anzuhängende SQL-Teil, oder ein leerer String bei einer
+	 *                unbekannten Kennung
+	 */
+	private function sortierung(string $listtype): string
+	{
+		switch ($listtype)
+		{
+			case 'eloN':
+				return 'ORDER BY rating DESC';
+			case 'eloB':
+				return 'ORDER BY blitz_rating DESC';
+			case 'eloR':
+				return 'ORDER BY rapid_rating DESC';
+			case 'eloNw':
+				return "AND sex='F' ORDER BY rating DESC";
+			case 'eloBw':
+				return "AND sex='F' ORDER BY blitz_rating DESC";
+			case 'eloRw':
+				return "AND sex='F' ORDER BY rapid_rating DESC";
+			default:
+				return '';
+		}
+	}
+
+	/**
+	 * Setzt den anzuzeigenden Namen aus Titel, Vor- und Nachname zusammen.
+	 *
+	 * @param object $objElo Der Datensatz des Spielers
+	 *
+	 * @return string Der zusammengesetzte Name
+	 */
+	private function name($objElo): string
+	{
+		return trim($objElo->intent.' '.$objElo->prename.' '.$objElo->surname);
+	}
+
+	/**
+	 * Liefert die zur Wertung passende Elo-Zahl des Spielers.
+	 *
+	 * @param object $objElo   Der Datensatz des Spielers
+	 * @param string $listtype Kennung der Wertung
+	 *
+	 * @return int Die Elo-Zahl, 0 wenn der Spieler in dieser Wertung keine hat
+	 */
+	private function wertung($objElo, string $listtype): int
+	{
+		$art = substr($listtype, 0, 4);
+
+		if ('eloN' === $art)
+		{
+			return (int) $objElo->rating;
 		}
 
-		return $result;
+		if ('eloB' === $art)
+		{
+			return (int) $objElo->blitz_rating;
+		}
+
+		return (int) $objElo->rapid_rating;
 	}
 }

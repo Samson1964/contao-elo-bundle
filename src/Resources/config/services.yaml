@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # Backend-Controller des FIDE-XML-Imports.
+    #
+    # Contao holt die Klasse in Backend::getBackendModule() über
+    # System::importStatic() — das prüft zuerst den Service-Container und greift
+    # nur dann auf "new" zurück. Der Dienst muss deshalb öffentlich sein und
+    # seine Service-ID dem Klassennamen entsprechen, damit die Abhängigkeiten
+    # per Konstruktor hineinkommen statt über statische Contao-Aufrufe.
+    Schachbulle\ContaoEloBundle\Classes\FideImport:
+        public: true
+        arguments:
+            $projektVerzeichnis: '%kernel.project_dir%'
